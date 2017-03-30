@@ -1,5 +1,9 @@
 # packd changelog
 
+## 1.1.0
+
+* Handle packages with `peerDependencies`, e.g. react-dom ([#1](https://github.com/Rich-Harris/packd/issues/1))
+
 ## 1.0.4
 
 * Timeout after 10 seconds
