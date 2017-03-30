@@ -11,6 +11,7 @@
 		body {
 			font-family: arial;
 			text-align: center;
+			line-height: 1.5;
 		}
 
 		main {
@@ -53,11 +54,29 @@
 		footer {
 			color: #999;
 			padding: 0 1em;
-			line-height: 1.5;
 		}
 
 		a {
 			color: #999;
+		}
+
+		.loading {
+			display: block;
+			margin: 1em auto 0 auto;
+			max-width: 20em;
+			font-style: 1em;
+			opacity: 0;
+			transition: opacity 0.2s;
+			transition-delay: 0.4s;
+		}
+
+		.loading.active {
+			opacity: 0.5;
+			animation-name: pulse;
+			animation-duration: 1s;
+			animation-delay: 0.8s;
+			animation-direction: alternate;
+			animation-iteration-count: infinite;
 		}
 
 		@media (min-width: 480px) {
@@ -70,6 +89,11 @@
 				font-size: 2em;
 			}
 		}
+
+		@keyframes pulse {
+			from { opacity: 0.5 }
+			to { opacity: 1 }
+		}
 	</style>
 </head>
 <body>
@@ -79,6 +103,10 @@
 			<input value='left-pad'>
 			<button><span>↵</span></button>
 		</form>
+
+		<span class='loading'>
+			packd is bundling your package. this may take a while for uncached packages.
+		</span>
 	</main>
 
 	<footer>
@@ -88,6 +116,8 @@
 	<script>
 		document.querySelector( 'form' ).addEventListener( 'submit', event => {
 			event.preventDefault();
+
+			document.querySelector( '.loading' ).classList.add( 'active' );
 
 			const input = document.querySelector( 'input' );
 			window.location.href = `/bundle/${input.value}`;
