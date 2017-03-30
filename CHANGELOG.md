@@ -1,5 +1,10 @@
 # packd changelog
 
+## 1.0.3
+
+* Add a loading indicator
+* Use favicon middleware
+
 ## 1.0.2
 
 * Fix bug that was prevent certain tarballs from being extracted

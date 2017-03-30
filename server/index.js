@@ -1,6 +1,7 @@
 const fs = require( 'fs' );
 const express = require( 'express' );
 const compression = require( 'compression' );
+const favicon = require( 'serve-favicon' );
 const servePackage = require( './serve-package.js' );
 const log = require( './log.js' );
 
@@ -8,6 +9,7 @@ const { root, tmpdir } = require( '../config.js' );
 
 const app = express();
 
+app.use( favicon( `${root}/public/favicon.ico` ) );
 app.use( compression() );
 
 app.use( '/log', ( req, res ) => {
