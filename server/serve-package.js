@@ -79,7 +79,7 @@ module.exports = function servePackage ( req, res ) {
 			});
 		})
 		.catch( err => {
-			log.error( err.message );
+			log.error( `[${qualified}] ${err.message}` );
 			res.status( 500 );
 			res.end( sander.readFileSync( `${root}/server/templates/500.html`, { encoding: 'utf-8' }) );
 		});
@@ -148,6 +148,13 @@ function fetchAndExtract ( pkg, version, dir ) {
 	log.info( `[${pkg.name}] fetching ${tarUrl}` );
 
 	return new Promise( ( fulfil, reject ) => {
+		let timedout = false;
+
+		const timeout = setTimeout( () => {
+			reject( new Error( 'Request timed out' ) );
+			timedout = true;
+		}, 10000 );
+
 		const input = request( tarUrl );
 
 		// don't like going via the filesystem, but piping into targz
@@ -157,7 +164,11 @@ function fetchAndExtract ( pkg, version, dir ) {
 		input.pipe( intermediate );
 
 		intermediate.on( 'close', () => {
-			targz().extract( `${dir}/package.tgz`, dir ).then( fulfil, reject );
+			clearTimeout( timeout );
+
+			if ( !timedout ) {
+				targz().extract( `${dir}/package.tgz`, dir ).then( fulfil, reject );
+			}
 		});
 	});
 }
