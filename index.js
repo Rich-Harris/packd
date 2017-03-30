@@ -11,7 +11,7 @@ const app = express();
 app.use( compression() );
 
 app.use( '/log', ( req, res ) => {
-	res.sendFile( `${root}/log` );
+	res.sendFile( `${root}/tmp/logfile` );
 });
 
 app.use( ( req, res, next ) => {
