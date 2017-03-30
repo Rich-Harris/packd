@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width'>
+	<link rel='icon' type='image/png' href='/favicon.png'>
+
+	<title>packd</title>
+
+	<style>
+		body {
+			font-family: arial;
+			text-align: center;
+		}
+
+		h1 {
+			font-size: 20vw;
+			text-transform: uppercase;
+			text-shadow: 2px 2px white, -2px -2px white, -2px 2px white, 2px -2px white;
+		}
+
+		h1:first-letter {
+			border: 0.1em solid black;
+			padding: 0em 0.15em;
+			margin-right: -0.3em;
+		}
+
+		input, button {
+			font-family: inherit;
+			font-size: 5vw;
+			border: 1px solid black;
+			outline: none;
+			padding: 0.2em;
+			background-color: white;
+			text-align: center;
+		}
+
+		button {
+			padding: 0.2em 1em;
+		}
+
+		button span {
+			font-size: 0.8em;
+		}
+
+		@media (min-width: 480px) {
+			h1 {
+				font-size: 7.2em;
+			}
+
+			input, button {
+				font-family: inherit;
+				font-size: 2em;
+			}
+		}
+	</style>
+</head>
+<body>
+	<h1>packd</h1>
+	<form>
+		<input value='left-pad'>
+		<button><span>↵</span></button>
+	</form>
+
+	<script>
+		document.querySelector( 'form' ).addEventListener( 'submit', event => {
+			event.preventDefault();
+
+			const input = document.querySelector( 'input' );
+			window.location.href = `/${input.value}`;
+		});
+	</script>
+</body>
+</html>

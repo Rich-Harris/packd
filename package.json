@@ -1,0 +1,40 @@
+{
+  "name": "packd",
+  "version": "1.0.0",
+  "description": "Simple alternative to browserify-cdn",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rich-Harris/packd.git"
+  },
+  "keywords": [
+    "browserify",
+    "bundler",
+    "npm"
+  ],
+  "author": "Rich Harris",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Rich-Harris/packd/issues"
+  },
+  "homepage": "https://github.com/Rich-Harris/packd#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+    "request": "^2.81.0",
+    "rollup": "^0.41.6",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "rollup-plugin-uglify": "^1.0.1",
+    "sander": "^0.6.0",
+    "semver": "^5.3.0",
+    "tar": "^2.2.1",
+    "tar.gz": "^1.0.5",
+    "yarn": "^0.21.3"
+  },
+  "devDependencies": {
+    "compression": "^1.6.2",
+    "serve-static": "^1.12.1"
+  }
+}
