@@ -4,7 +4,7 @@
 
 This is a simple app for generating UMD bundles of npm packages, similar to [browserify-cdn](https://github.com/jfhbrook/wzrd.in) aka [wzrd.in](https://wzrd.in/). I made it because wzrd.in sometimes goes offline, and I need its functionality for the [Svelte REPL](https://svelte.technology/repl). Unfortunately I couldn't get browserify-cdn to run on [now.sh](https://zeit.co/now), so I decided to roll my own.
 
-And since I was *roll*ing my own, it made sense to use [Rollup](https://rollupjs.org). (Feel free to roll your eyes.) For npm packages that expose [`pkg.module`](https://github.com/rollup/rollup/wiki/pkg.module), such as the [D3 modules](https://github.com/d3), this means you get smaller, more efficient bundles than with browserify-cdn.
+And since I was *roll*ing my own, it made sense to use [Rollup](https://rollupjs.org). (Feel free to roll your eyes.) For npm packages that expose [`pkg.module`](https://github.com/rollup/rollup/wiki/pkg.module), such as the [D3 modules](https://github.com/d3), this means you get smaller, more efficient bundles than with browserify-cdn. packd also gzips the files it serves, typically resulting in much smaller requests.
 
 Since Rollup can't handle all of the CommonJS code on npm, packd will use Browserify (or a combination of Rollup and Browserify) where appropriate.
 
@@ -35,6 +35,14 @@ If you're using these URLs with `<script>` tags, you may need to specify the mod
 ## Hosting an instance
 
 packd is a straightforward Express app — clone this repo, `npm install` (or `yarn install`), then `npm start`. To host on [now](https://zeit.co/now), simply `npm install -g now` and run `now`.
+
+
+
+## Is this like unpkg.com?
+
+No. [unpkg.com](https://unpkg.com) is like a CDN for npm — it serves the actual files in npm packages. In a lot of cases that's perfect, but since some library authors don't include distributable bundles (tsk, tsk) it's not a general solution to the problem that packd addresses. Moreover, many npm package authors don't minify their code, whereas packd does.
+
+It is, however, blazing fast and extremely reliable. If a distributable version of a dependency *is* on unpkg, you should always prefer that.
 
 
 
