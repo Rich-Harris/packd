@@ -4,7 +4,7 @@
 
 This is a simple app for generating UMD bundles of npm packages, similar to [browserify-cdn](https://github.com/jfhbrook/wzrd.in) aka [wzrd.in](https://wzrd.in/). I made it because wzrd.in sometimes goes offline, and I need its functionality for the [Svelte REPL](https://svelte.technology/repl). Unfortunately I couldn't get browserify-cdn to run on [now.sh](https://zeit.co/now), so I decided to roll my own.
 
-And since I was *roll*ing my own, it made sense to use [Rollup](https://rollupjs.org). (Feel free to roll your eyes.) For npm packages that expose [`pkg.module`](https://github.com/rollup/rollup/wiki/pkg.module), such as the [D3 modules](https://github.com/d3) this means you get smaller, more efficient bundles than with browserify-cdn.
+And since I was *roll*ing my own, it made sense to use [Rollup](https://rollupjs.org). (Feel free to roll your eyes.) For npm packages that expose [`pkg.module`](https://github.com/rollup/rollup/wiki/pkg.module), such as the [D3 modules](https://github.com/d3), this means you get smaller, more efficient bundles than with browserify-cdn.
 
 Since Rollup can't handle all of the CommonJS code on npm, packd will use Browserify (or a combination of Rollup and Browserify) where appropriate.
 
