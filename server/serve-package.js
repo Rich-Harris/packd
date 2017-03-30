@@ -113,7 +113,7 @@ function fetchBundle ( pkg, version, query ) {
 		inProgress[ hash ] = sander.mkdir( dir )
 			.then( () => fetchAndExtract( pkg, version, dir ) )
 			.then( () => sanitizePkg( cwd ) )
-			.then( () => installDependencies( pkg, cwd ) )
+			.then( () => installDependencies( cwd ) )
 			.then( () => bundle( cwd, query ) )
 			.then( code => {
 				log.info( `[${pkg.name}] minifying` );
@@ -179,22 +179,35 @@ function sanitizePkg ( cwd ) {
 	return sander.writeFile( `${cwd}/package.json`, JSON.stringify( pkg, null, '  ' ) );
 }
 
-function installDependencies ( pkg, cwd ) {
+function exec ( cmd, cwd ) {
 	return new Promise( ( fulfil, reject ) => {
-		log.info( `[${pkg.name}] running yarn install --production` );
-
-		child_process.exec( `${root}/node_modules/.bin/yarn install --production`, { cwd }, ( err, stdout, stderr ) => {
+		child_process.exec( cmd, { cwd }, ( err, stdout, stderr ) => {
 			if ( err ) {
 				return reject( err );
 			}
-
-			log.info( `[${pkg.name}] installed dependencies` );
 
 			console.log( stdout );
 			console.error( stderr );
 
 			fulfil();
 		});
+	});
+}
+
+function installDependencies ( cwd ) {
+	const pkg = require( `${cwd}/package.json` );
+	log.info( `[${pkg.name}] running yarn --production` );
+	console.log( `pkg`, pkg )
+	return exec( `${root}/node_modules/.bin/yarn --production`, cwd ).then( () => {
+		if ( !pkg.peerDependencies ) return;
+
+		return Object.keys( pkg.peerDependencies ).reduce( ( promise, name ) => {
+			return promise.then( () => {
+				log.info( `[${pkg.name}] installing peer dependency ${name}` );
+				const version = pkg.peerDependencies[ name ];
+				return exec( `${root}/node_modules/.bin/yarn add ${name}@${version}`, cwd );
+			});
+		}, Promise.resolve() );
 	});
 }
 
