@@ -1,5 +1,9 @@
 # packd changelog
 
+## 1.0.4
+
+* Timeout after 10 seconds
+
 ## 1.0.3
 
 * Add a loading indicator
