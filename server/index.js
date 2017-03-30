@@ -4,14 +4,14 @@ const compression = require( 'compression' );
 const servePackage = require( './serve-package.js' );
 const log = require( './log.js' );
 
-const { root } = require( '../config.js' );
+const { root, tmpdir } = require( '../config.js' );
 
 const app = express();
 
 app.use( compression() );
 
 app.use( '/log', ( req, res ) => {
-	res.sendFile( `/tmp/log` );
+	res.sendFile( `${tmpdir}/log` );
 });
 
 app.use( ( req, res, next ) => {

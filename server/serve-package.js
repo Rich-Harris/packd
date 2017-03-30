@@ -14,7 +14,7 @@ const get = require( './utils/get.js' );
 const makeLegalIdentifier = require( './utils/makeLegalIdentifier' );
 const log = require( './log.js' );
 
-const { root, registry } = require( '../config.js' );
+const { root, tmpdir, registry } = require( '../config.js' );
 
 const cache = LRU({
 	max: 128 * 1024 * 1024,
@@ -97,8 +97,12 @@ function fetchBundle ( pkg, version, query ) {
 		return Promise.resolve( cache.get( hash ) );
 	}
 
-	if ( !inProgress[ hash ] ) {
-		const dir = `/tmp/${hash}`;
+	if ( inProgress[ hash ] ) {
+		log.info( `[${pkg.name}] request was already in progress` );
+	} else {
+		log.info( `[${pkg.name}] is not cached` );
+
+		const dir = `${tmpdir}/${hash}`;
 		const cwd = `${dir}/package`;
 
 		function cleanup () {
@@ -141,21 +145,19 @@ function fetchBundle ( pkg, version, query ) {
 function fetchAndExtract ( pkg, version, dir ) {
 	const tarUrl = pkg.versions[ version ].dist.tarball;
 
+	log.info( `[${pkg.name}] fetching ${tarUrl}` );
+
 	return new Promise( ( fulfil, reject ) => {
-		const stream = request( tarUrl ).pipe(
-			targz({
-				fromBase: true
-			}).createWriteStream( dir )
-		);
+		const input = request( tarUrl );
 
-		stream.on( 'end', () => {
-			log.info( `[${pkg.name}] got tarball` );
-			fulfil();
-		});
+		// don't like going via the filesystem, but piping into targz
+		// was failing for some weird reason
+		const intermediate = sander.createWriteStream( `${dir}/package.tgz` );
 
-		stream.on( 'error', err => {
-			log.error( err.message );
-			reject( err );
+		input.pipe( intermediate );
+
+		intermediate.on( 'close', () => {
+			targz().extract( `${dir}/package.tgz`, dir ).then( fulfil, reject );
 		});
 	});
 }
