@@ -37,7 +37,11 @@ app.use( express.static( `${root}/public`, {
 app.get( '/bundle/:id', servePackage );
 
 app.get( '/', ( req, res ) => {
-	fs.createReadStream( `${root}/public/index.html` ).pipe( res );
+	res.status( 200 );
+	const index = fs.readFileSync( `${root}/server/templates/index.html`, 'utf-8' )
+		.replace( '__VERSION__', require( '../package.json' ).version );
+
+	res.end( index );
 });
 
 app.listen( 9000, () => {

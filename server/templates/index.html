@@ -13,10 +13,17 @@
 			text-align: center;
 		}
 
+		main {
+			min-height: calc(100vh - 6em);
+			padding: 4em 1em;
+			box-sizing: border-box;
+		}
+
 		h1 {
 			font-size: 20vw;
 			text-transform: uppercase;
 			text-shadow: 2px 2px white, -2px -2px white, -2px 2px white, 2px -2px white;
+			margin: 0 0 1em 0;
 		}
 
 		h1:first-letter {
@@ -43,6 +50,16 @@
 			font-size: 0.8em;
 		}
 
+		footer {
+			color: #999;
+			padding: 0 1em;
+			line-height: 1.5;
+		}
+
+		a {
+			color: #999;
+		}
+
 		@media (min-width: 480px) {
 			h1 {
 				font-size: 7.2em;
@@ -56,11 +73,17 @@
 	</style>
 </head>
 <body>
-	<h1>packd</h1>
-	<form>
-		<input value='left-pad'>
-		<button><span>↵</span></button>
-	</form>
+	<main>
+		<h1>packd</h1>
+		<form>
+			<input value='left-pad'>
+			<button><span>↵</span></button>
+		</form>
+	</main>
+
+	<footer>
+		Rollup/Browserify as a service.<br>Version __VERSION__. <a href='https://github.com/Rich-Harris/packd'>GitHub</a>
+	</footer>
 
 	<script>
 		document.querySelector( 'form' ).addEventListener( 'submit', event => {
