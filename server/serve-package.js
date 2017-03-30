@@ -81,7 +81,7 @@ module.exports = function servePackage ( req, res ) {
 		.catch( err => {
 			log.error( err.message );
 			res.status( 500 );
-			res.end( 'server error' );
+			res.end( sander.readFileSync( `${root}/server/templates/500.html`, { encoding: 'utf-8' }) );
 		});
 };
 
