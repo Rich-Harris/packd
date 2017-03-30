@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/Rich-Harris/packd#readme",
   "dependencies": {
+    "browserify": "^14.1.0",
     "express": "^4.15.2",
+    "minilog": "^3.1.0",
     "request": "^2.81.0",
     "rollup": "^0.41.6",
     "rollup-plugin-node-resolve": "^2.0.0",
@@ -31,10 +33,12 @@
     "semver": "^5.3.0",
     "tar": "^2.2.1",
     "tar.gz": "^1.0.5",
+    "uglifyjs": "^2.4.10",
     "yarn": "^0.21.3"
   },
   "devDependencies": {
     "compression": "^1.6.2",
+    "eslint": "^3.18.0",
     "serve-static": "^1.12.1"
   }
 }
