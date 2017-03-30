@@ -1,17 +1,17 @@
 const fs = require( 'fs' );
 const express = require( 'express' );
 const compression = require( 'compression' );
-const servePackage = require( './lib/serve-package.js' );
-const log = require( './lib/log.js' );
+const servePackage = require( './serve-package.js' );
+const log = require( './log.js' );
 
-const { root } = require( './config.js' );
+const { root } = require( '../config.js' );
 
 const app = express();
 
 app.use( compression() );
 
 app.use( '/log', ( req, res ) => {
-	res.sendFile( `${root}/tmp/logfile` );
+	res.sendFile( `/tmp/log` );
 });
 
 app.use( ( req, res, next ) => {

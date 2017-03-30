@@ -2,9 +2,9 @@
   "name": "packd",
   "version": "1.0.0",
   "description": "Simple alternative to browserify-cdn",
-  "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server",
+    "deploy": "now && now alias"
   },
   "repository": {
     "type": "git",
@@ -40,6 +40,15 @@
   "devDependencies": {
     "compression": "^1.6.2",
     "eslint": "^3.18.0",
+    "now": "^4.10.2",
     "serve-static": "^1.12.1"
+  },
+  "now": {
+    "alias": "packd",
+    "files": [
+      "public",
+      "server",
+      "config.js"
+    ]
   }
 }

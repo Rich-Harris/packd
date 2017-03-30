@@ -14,7 +14,7 @@ const get = require( './utils/get.js' );
 const makeLegalIdentifier = require( './utils/makeLegalIdentifier' );
 const log = require( './log.js' );
 
-const { root } = require( '../config.js' );
+const { root, registry } = require( '../config.js' );
 
 const cache = LRU({
 	max: 128 * 1024 * 1024,
@@ -41,7 +41,7 @@ module.exports = function servePackage ( req, res ) {
 
 	const qualified = user ? `@${user}/${id}` : id;
 
-	get( `http://registry.npmjs.org/${encodeURIComponent( qualified )}` ).then( JSON.parse )
+	get( `${registry}/${encodeURIComponent( qualified )}` ).then( JSON.parse )
 		.then( pkg => {
 			if ( !pkg.versions ) {
 				log.error( `[${qualified}] invalid module` );
@@ -89,7 +89,6 @@ const inProgress = {};
 
 function fetchBundle ( pkg, version, query ) {
 	const hash = `${pkg.name}@${version}${stringify(query)}`;
-	const file = `${root}/.cache/${hash}.js`;
 
 	log.info( `[${pkg.name}] requested package` );
 
@@ -99,7 +98,7 @@ function fetchBundle ( pkg, version, query ) {
 	}
 
 	if ( !inProgress[ hash ] ) {
-		const dir = `${root}/tmp/${hash}`;
+		const dir = `/tmp/${hash}`;
 		const cwd = `${dir}/package`;
 
 		function cleanup () {
@@ -111,7 +110,7 @@ function fetchBundle ( pkg, version, query ) {
 			.then( () => fetchAndExtract( pkg, version, dir ) )
 			.then( () => sanitizePkg( cwd ) )
 			.then( () => installDependencies( pkg, cwd ) )
-			.then( () => bundle( cwd, query, file ) )
+			.then( () => bundle( cwd, query ) )
 			.then( code => {
 				log.info( `[${pkg.name}] minifying` );
 				const minified = UglifyJS.minify( code, { fromString: true }).code;
@@ -177,7 +176,7 @@ function installDependencies ( pkg, cwd ) {
 	});
 }
 
-function bundle ( cwd, query, file ) {
+function bundle ( cwd, query ) {
 	const pkg = require( `${cwd}/package.json` );
 	const moduleName = query.name || makeLegalIdentifier( pkg.name );
 
@@ -185,15 +184,15 @@ function bundle ( cwd, query, file ) {
 
 	if ( moduleEntry ) {
 		log.info( `[${pkg.name}] ES2015 module found, using Rollup` );
-		return bundleWithRollup( cwd, pkg, moduleEntry, file, moduleName );
+		return bundleWithRollup( cwd, pkg, moduleEntry, moduleName );
 	} else {
 		log.info( `[${pkg.name}] No ES2015 module found, using Browserify` );
 		const main = path.resolve( cwd, pkg.main || 'index.js' );
-		return bundleWithBrowserify( pkg, main, file, moduleName );
+		return bundleWithBrowserify( pkg, main, moduleName );
 	}
 }
 
-function bundleWithRollup ( cwd, pkg, moduleEntry, file, moduleName ) {
+function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
 	return rollup.rollup({
 		entry: path.resolve( cwd, moduleEntry ),
 		plugins: [
@@ -210,7 +209,7 @@ function bundleWithRollup ( cwd, pkg, moduleEntry, file, moduleName ) {
 				dest: intermediate,
 				format: 'cjs'
 			}).then( () => {
-				return bundleWithBrowserify( pkg, intermediate, file, moduleName );
+				return bundleWithBrowserify( pkg, intermediate, moduleName );
 			});
 		}
 
@@ -223,7 +222,7 @@ function bundleWithRollup ( cwd, pkg, moduleEntry, file, moduleName ) {
 	});
 }
 
-function bundleWithBrowserify ( pkg, main, file, moduleName ) {
+function bundleWithBrowserify ( pkg, main, moduleName ) {
 	const b = browserify( main, {
 		standalone: moduleName
 	});
