@@ -197,7 +197,7 @@ function exec ( cmd, cwd ) {
 function installDependencies ( cwd ) {
 	const pkg = require( `${cwd}/package.json` );
 	log.info( `[${pkg.name}] running yarn --production` );
-	console.log( `pkg`, pkg )
+
 	return exec( `${root}/node_modules/.bin/yarn --production`, cwd ).then( () => {
 		if ( !pkg.peerDependencies ) return;
 
