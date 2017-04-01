@@ -1,4 +1,5 @@
 const fs = require( 'fs' );
+const readline = require( 'readline' );
 const express = require( 'express' );
 const compression = require( 'compression' );
 const favicon = require( 'serve-favicon' );
@@ -12,8 +13,25 @@ const app = express();
 app.use( favicon( `${root}/public/favicon.ico` ) );
 app.use( compression() );
 
-app.use( '/log', ( req, res ) => {
-	res.sendFile( `${tmpdir}/log` );
+app.use( '/_log', ( req, res ) => {
+	const filter = req.query.filter;
+	if ( filter ) {
+		const rl = readline.createInterface({
+			input: fs.createReadStream( `${tmpdir}/log` )
+		});
+
+		const pattern = new RegExp( `^packd \\w+ \\[${req.query.filter}\\]` );
+
+		rl.on( 'line', line => {
+			if ( pattern.test( line ) ) res.write( line + '\n' );
+		});
+
+		rl.on( 'close', () => {
+			res.end();
+		});
+	} else {
+		res.sendFile( `${tmpdir}/log` );
+	}
 });
 
 app.use( ( req, res, next ) => {
