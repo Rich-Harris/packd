@@ -26,7 +26,7 @@ function stringify ( query ) {
 module.exports = function servePackage ( req, res, next ) {
 	if ( req.method !== 'GET' ) return next();
 
-	const match = /^\/(?:@([^\/]+)\/)?([^@\/]+)(?:@(.+?))?(?:\/(.+))?(?:\?(.+)?)$/.exec( req.url );
+	const match = /^\/(?:@([^\/]+)\/)?([^@\/]+)(?:@(.+?))?(?:\/(.+))?(?:\?(.+))?$/.exec( req.url );
 
 	if ( !match ) {
 		// TODO make this prettier

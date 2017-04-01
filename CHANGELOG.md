@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.1.1
+
+* Fix bug with route matching regex
+
 ## 2.1.0
 
 * Support semver ranges
