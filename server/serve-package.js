@@ -179,7 +179,7 @@ function sanitizePkg ( cwd ) {
 	return sander.writeFile( `${cwd}/package.json`, JSON.stringify( pkg, null, '  ' ) );
 }
 
-function exec ( cmd, cwd ) {
+function exec ( cmd, cwd, pkg ) {
 	return new Promise( ( fulfil, reject ) => {
 		child_process.exec( cmd, { cwd }, ( err, stdout, stderr ) => {
 			if ( err ) {
@@ -187,11 +187,11 @@ function exec ( cmd, cwd ) {
 			}
 
 			stdout.split( '\n' ).forEach( line => {
-				logger.info( line );
+				logger.info( `[${pkg.name}] ${line}` );
 			});
 
 			stderr.split( '\n' ).forEach( line => {
-				logger.info( line );
+				logger.info( `[${pkg.name}] ${line}` );
 			});
 
 			fulfil();
@@ -203,14 +203,14 @@ function installDependencies ( cwd ) {
 	const pkg = require( `${cwd}/package.json` );
 	logger.info( `[${pkg.name}] running yarn --production` );
 
-	return exec( `${root}/node_modules/.bin/yarn --production`, cwd ).then( () => {
+	return exec( `${root}/node_modules/.bin/yarn --production`, cwd, pkg ).then( () => {
 		if ( !pkg.peerDependencies ) return;
 
 		return Object.keys( pkg.peerDependencies ).reduce( ( promise, name ) => {
 			return promise.then( () => {
 				logger.info( `[${pkg.name}] installing peer dependency ${name}` );
 				const version = pkg.peerDependencies[ name ];
-				return exec( `${root}/node_modules/.bin/yarn add ${name}@${version}`, cwd );
+				return exec( `${root}/node_modules/.bin/yarn add ${name}@${version}`, cwd, pkg );
 			});
 		}, Promise.resolve() );
 	});

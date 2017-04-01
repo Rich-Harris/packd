@@ -16,4 +16,4 @@ module.exports = function get ( url ) {
 			response.on( 'error', reject );
 		});
 	});
-}
+};
