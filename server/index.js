@@ -67,8 +67,6 @@ app.use( express.static( `${root}/public`, {
 	maxAge: 600
 }));
 
-app.get( '/:id', servePackage );
-
 app.get( '/', ( req, res ) => {
 	res.status( 200 );
 	const index = fs.readFileSync( `${root}/server/templates/index.html`, 'utf-8' )
@@ -76,6 +74,10 @@ app.get( '/', ( req, res ) => {
 
 	res.end( index );
 });
+
+app.use( servePackage );
+
+// TODO 404
 
 app.listen( 9000, () => {
 	logger.log( `started at ${new Date().toUTCString()}` );

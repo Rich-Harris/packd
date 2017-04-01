@@ -24,6 +24,7 @@
   "dependencies": {
     "browserify": "^14.1.0",
     "express": "^4.15.2",
+    "is-module": "^1.0.0",
     "lru-cache": "^4.0.2",
     "minilog": "^3.1.0",
     "request": "^2.81.0",

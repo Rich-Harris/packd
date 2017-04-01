@@ -10,6 +10,7 @@ const browserify = require( 'browserify' );
 const rollup = require( 'rollup' );
 const resolve = require( 'rollup-plugin-node-resolve' );
 const UglifyJS = require( 'uglifyjs' );
+const isModule = require( 'is-module' );
 const get = require( './utils/get.js' );
 const makeLegalIdentifier = require( './utils/makeLegalIdentifier' );
 const logger = require( './logger.js' );
@@ -26,11 +27,14 @@ function stringify ( query ) {
 	return str ? `?${str}` : '';
 }
 
-module.exports = function servePackage ( req, res ) {
-	const match = /^(?:@([^\/]+)\/)?([^@\/]+)(?:@(.+))?$/.exec( req.params.id );
+module.exports = function servePackage ( req, res, next ) {
+	if ( req.method !== 'GET' ) return next();
+
+	const match = /^\/(?:@([^\/]+)\/)?([^@\/]+)(?:@(.+?))?(?:\/(.+))?$/.exec( req.url );
 
 	if ( !match ) {
-		res.statusCode( 400 );
+		// TODO make this prettier
+		res.status( 400 );
 		res.end( 'Invalid module ID' );
 		return;
 	}
@@ -38,6 +42,7 @@ module.exports = function servePackage ( req, res ) {
 	const user = match[1];
 	const id = match[2];
 	const tag = match[3] || 'latest';
+	const deep = match[4];
 
 	const qualified = user ? `@${user}/${id}` : id;
 
@@ -55,7 +60,11 @@ module.exports = function servePackage ( req, res ) {
 			if ( !semver.valid( tag ) ) {
 				const version = pkg[ 'dist-tags' ][ tag ];
 				if ( semver.valid( version ) ) {
-					res.redirect( 302, `/bundle/${pkg.name}@${version}${stringify( req.query )}` );
+					let url = `/${pkg.name}@${version}`;
+					if ( deep ) url += `/${deep}`;
+					url += stringify( req.query );
+
+					res.redirect( 302, url );
 				} else {
 					logger.error( `[${qualified}] invalid tag` );
 
@@ -66,7 +75,7 @@ module.exports = function servePackage ( req, res ) {
 				return;
 			}
 
-			return fetchBundle( pkg, tag, req.query ).then( zipped => {
+			return fetchBundle( pkg, tag, deep, req.query ).then( zipped => {
 				logger.info( `[${qualified}] serving ${zipped.length} bytes` );
 				res.status( 200 );
 				res.set({
@@ -87,8 +96,10 @@ module.exports = function servePackage ( req, res ) {
 
 const inProgress = {};
 
-function fetchBundle ( pkg, version, query ) {
-	const hash = `${pkg.name}@${version}${stringify(query)}`;
+function fetchBundle ( pkg, version, deep, query ) {
+	let hash = `${pkg.name}@${version}`;
+	if ( deep ) hash += `_${deep.replace( /\//g, '_' )}`;
+	hash += stringify( query );
 
 	logger.info( `[${pkg.name}] requested package` );
 
@@ -114,7 +125,7 @@ function fetchBundle ( pkg, version, query ) {
 			.then( () => fetchAndExtract( pkg, version, dir ) )
 			.then( () => sanitizePkg( cwd ) )
 			.then( () => installDependencies( cwd ) )
-			.then( () => bundle( cwd, query ) )
+			.then( () => bundle( cwd, deep, query ) )
 			.then( code => {
 				logger.info( `[${pkg.name}] minifying` );
 
@@ -216,19 +227,32 @@ function installDependencies ( cwd ) {
 	});
 }
 
-function bundle ( cwd, query ) {
+function bundle ( cwd, deep, query ) {
 	const pkg = require( `${cwd}/package.json` );
 	const moduleName = query.name || makeLegalIdentifier( pkg.name );
 
-	const moduleEntry = pkg.module || pkg[ 'jsnext:main' ];
+	const entry = deep ?
+		path.resolve( cwd, deep ) :
+		findEntry( path.resolve( cwd, ( pkg.module || pkg[ 'jsnext:main' ] || pkg.main || 'index.js' ) ) );
 
-	if ( moduleEntry ) {
+	const code = sander.readFileSync( entry, { encoding: 'utf-8' });
+
+	if ( isModule( code ) ) {
 		logger.info( `[${pkg.name}] ES2015 module found, using Rollup` );
-		return bundleWithRollup( cwd, pkg, moduleEntry, moduleName );
+		return bundleWithRollup( cwd, pkg, entry, moduleName );
 	} else {
 		logger.info( `[${pkg.name}] No ES2015 module found, using Browserify` );
-		const main = path.resolve( cwd, pkg.main || 'index.js' );
-		return bundleWithBrowserify( pkg, main, moduleName );
+		return bundleWithBrowserify( pkg, entry, moduleName );
+	}
+}
+
+function findEntry ( file ) {
+	try {
+		const stats = sander.statSync( file );
+		if ( stats.isDirectory() ) return `${file}/index.js`;
+		return file;
+	} catch ( err ) {
+		return `${file}.js`;
 	}
 }
 
