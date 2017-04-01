@@ -2,7 +2,6 @@ const path = require( 'path' );
 const sander = require( 'sander' );
 const semver = require( 'semver' );
 const targz = require( 'tar.gz' );
-const LRU = require( 'lru-cache' );
 const zlib = require( 'zlib' );
 const request = require( 'request' );
 const child_process = require( 'child_process' );
@@ -14,13 +13,9 @@ const isModule = require( 'is-module' );
 const get = require( './utils/get.js' );
 const makeLegalIdentifier = require( './utils/makeLegalIdentifier' );
 const logger = require( './logger.js' );
+const cache = require( './cache.js' );
 
 const { root, tmpdir, registry } = require( '../config.js' );
-
-const cache = LRU({
-	max: 128 * 1024 * 1024,
-	length: src => src.length
-});
 
 function stringify ( query ) {
 	const str = Object.keys( query ).sort().map( key => `${key}=${query[key]}` ).join( '&' );

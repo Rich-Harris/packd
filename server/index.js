@@ -2,9 +2,12 @@ const fs = require( 'fs' );
 const readline = require( 'readline' );
 const express = require( 'express' );
 const compression = require( 'compression' );
+const prettyBytes = require( 'pretty-bytes' );
 const favicon = require( 'serve-favicon' );
+const padRight = require( './utils/padRight.js' );
 const servePackage = require( './serve-package.js' );
 const logger = require( './logger.js' );
+const cache = require( './cache.js' );
 
 const { root, tmpdir } = require( '../config.js' );
 
@@ -13,7 +16,7 @@ const app = express();
 app.use( favicon( `${root}/public/favicon.ico` ) );
 app.use( compression() );
 
-app.use( '/_log', ( req, res ) => {
+app.get( '/_log', ( req, res ) => {
 	const filter = req.query.filter;
 	if ( filter ) {
 		const rl = readline.createInterface({
@@ -32,6 +35,42 @@ app.use( '/_log', ( req, res ) => {
 	} else {
 		res.sendFile( `${tmpdir}/log` );
 	}
+});
+
+app.get( '/_cache', ( req, res ) => {
+	res.status( 200 );
+	res.write( `Total cached bundles: ${prettyBytes( cache.length )}\n` );
+
+	const table = [];
+	let maxKey = 7; // 'package'.length
+	let maxSize = 4; // 'size'.length
+
+	cache.forEach( ( value, pkg ) => {
+		const size = value.length;
+		const sizeLabel = prettyBytes( size );
+
+		table.push({ pkg, size, sizeLabel });
+
+		maxKey = Math.max( maxKey, pkg.length );
+		maxSize = Math.max( maxSize, sizeLabel.length );
+	});
+
+	if ( req.query.sort === 'size' ) {
+		table.sort( ( a, b ) => b.size - a.size );
+	}
+
+	const separator = padRight( '', maxKey + maxSize + 5, '─' );
+
+	res.write( `┌${separator}┐\n` );
+	res.write( `│ ${padRight( 'package', maxKey )} │ ${padRight( 'size', maxSize )} │\n` );
+	res.write( `├${separator}┤\n` );
+
+	table.forEach( row => {
+		res.write( `│ ${padRight( row.pkg, maxKey )} │ ${padRight( row.sizeLabel, maxSize )} │\n` );
+	});
+	res.write( `└${separator}┘\n` );
+
+	res.end();
 });
 
 // log requests
