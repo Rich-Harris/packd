@@ -26,7 +26,7 @@ function stringify ( query ) {
 module.exports = function servePackage ( req, res, next ) {
 	if ( req.method !== 'GET' ) return next();
 
-	const match = /^\/(?:@([^\/]+)\/)?([^@\/]+)(?:@(.+?))?(?:\/(.+))?$/.exec( req.url );
+	const match = /^\/(?:@([^\/]+)\/)?([^@\/]+)(?:@(.+?))?(?:\/(.+))?(?:\?(.+)?)$/.exec( req.url );
 
 	if ( !match ) {
 		// TODO make this prettier
@@ -39,8 +39,16 @@ module.exports = function servePackage ( req, res, next ) {
 	const id = match[2];
 	const tag = match[3] || 'latest';
 	const deep = match[4];
+	const queryString = match[5];
 
 	const qualified = user ? `@${user}/${id}` : id;
+	const query = ( queryString || '' )
+		.split( '&' )
+		.reduce( ( query, pair ) => {
+			const [ key, value ] = pair.split( '=' );
+			query[ key ] = value || true;
+			return query;
+		}, {} );
 
 	get( `${registry}/${encodeURIComponent( qualified )}` ).then( JSON.parse )
 		.then( meta => {
@@ -66,13 +74,13 @@ module.exports = function servePackage ( req, res, next ) {
 			if ( version !== tag ) {
 				let url = `/${meta.name}@${version}`;
 				if ( deep ) url += `/${deep}`;
-				url += stringify( req.query );
+				url += stringify( query );
 
 				res.redirect( 302, url );
 				return;
 			}
 
-			return fetchBundle( meta, tag, deep, req.query ).then( zipped => {
+			return fetchBundle( meta, tag, deep, query ).then( zipped => {
 				logger.info( `[${qualified}] serving ${zipped.length} bytes` );
 				res.status( 200 );
 				res.set({
@@ -175,6 +183,7 @@ function fetchAndExtract ( pkg, version, dir ) {
 			clearTimeout( timeout );
 
 			if ( !timedout ) {
+				logger.info( `[${pkg.name}] extracting to ${dir}/package` );
 				targz().extract( `${dir}/package.tgz`, dir ).then( fulfil, reject );
 			}
 		});
