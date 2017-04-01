@@ -1,5 +1,10 @@
 # packd changelog
 
+## 2.1.0
+
+* Support semver ranges
+* Add message encouraging package authors to use pkg.module
+
 ## 2.0.0
 
 * Shorten URLs — `/bundle/foo` is now just `/foo`
@@ -8,7 +13,7 @@
 * Filter logs by package name: `/_log?filter=left-pad`
 * Include yarn output in logs
 * Use `modulesOnly` option in rollup-plugin-node-resolve to increase reliability for packages that import CommonJS from ESM ([#2](https://github.com/Rich-Harris/packd/issues/2))
-* Allow deep imports (`/core-js/es6/array.js`)
+* Allow deep imports (e.g. `/lodash-es/range.js`)
 
 ## 1.1.0
 
