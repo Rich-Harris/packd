@@ -34,6 +34,7 @@ app.use( '/_log', ( req, res ) => {
 	}
 });
 
+// log requests
 app.use( ( req, res, next ) => {
 	const remoteAddr = (function () {
 		if (req.ip) return req.ip;
@@ -50,11 +51,23 @@ app.use( ( req, res, next ) => {
 	next();
 });
 
+// redirect /bundle/foo to /foo
+app.get( '/bundle/:id', ( req, res ) => {
+	const queryString = Object.keys( req.query )
+		.map( key => `${key}=${encodeURIComponent( req.query[ key ] )}` )
+		.join( '&' );
+
+	let url = req.url.replace( '/bundle', '' );
+	if ( queryString ) url += `?${queryString}`;
+
+	res.redirect( 301, url );
+});
+
 app.use( express.static( `${root}/public`, {
 	maxAge: 600
 }));
 
-app.get( '/bundle/:id', servePackage );
+app.get( '/:id', servePackage );
 
 app.get( '/', ( req, res ) => {
 	res.status( 200 );
