@@ -11,6 +11,7 @@ const resolve = require( 'rollup-plugin-node-resolve' );
 const UglifyJS = require( 'uglifyjs' );
 const isModule = require( 'is-module' );
 const get = require( './utils/get.js' );
+const findVersion = require( './utils/findVersion.js' );
 const makeLegalIdentifier = require( './utils/makeLegalIdentifier' );
 const logger = require( './logger.js' );
 const cache = require( './cache.js' );
@@ -42,8 +43,8 @@ module.exports = function servePackage ( req, res, next ) {
 	const qualified = user ? `@${user}/${id}` : id;
 
 	get( `${registry}/${encodeURIComponent( qualified )}` ).then( JSON.parse )
-		.then( pkg => {
-			if ( !pkg.versions ) {
+		.then( meta => {
+			if ( !meta.versions ) {
 				logger.error( `[${qualified}] invalid module` );
 
 				res.status( 400 );
@@ -52,25 +53,26 @@ module.exports = function servePackage ( req, res, next ) {
 				return;
 			}
 
-			if ( !semver.valid( tag ) ) {
-				const version = pkg[ 'dist-tags' ][ tag ];
-				if ( semver.valid( version ) ) {
-					let url = `/${pkg.name}@${version}`;
-					if ( deep ) url += `/${deep}`;
-					url += stringify( req.query );
+			const version = findVersion( meta, tag );
 
-					res.redirect( 302, url );
-				} else {
-					logger.error( `[${qualified}] invalid tag` );
+			if ( !semver.valid( version ) ) {
+				logger.error( `[${qualified}] invalid tag` );
 
-					res.status( 400 );
-					res.end( 'invalid tag' );
-				}
-
+				res.status( 400 );
+				res.end( 'invalid tag' );
 				return;
 			}
 
-			return fetchBundle( pkg, tag, deep, req.query ).then( zipped => {
+			if ( version !== tag ) {
+				let url = `/${meta.name}@${version}`;
+				if ( deep ) url += `/${deep}`;
+				url += stringify( req.query );
+
+				res.redirect( 302, url );
+				return;
+			}
+
+			return fetchBundle( meta, tag, deep, req.query ).then( zipped => {
 				logger.info( `[${qualified}] serving ${zipped.length} bytes` );
 				res.status( 200 );
 				res.set({
