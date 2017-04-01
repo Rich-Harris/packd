@@ -13,22 +13,22 @@ Since Rollup can't handle all of the CommonJS code on npm, packd will use Browse
 
 You can try a hosted version of packd at https://packd.now.sh. **This is not designed with production use in mind! Please host your own instance if you want to use packd for your own apps.**
 
-Bundles can be accessed [like so](https://packd.now.sh/bundle/left-pad). Bear in mind that if a bundle isn't cached, it needs to be installed and built before it can be served, which may take a little while:
+Bundles can be accessed [like so](https://packd.now.sh/left-pad). Bear in mind that if a bundle isn't cached, it needs to be installed and built before it can be served, which may take a little while:
 
 ```
-/bundle/[name]
+/[name]
 ```
 
 You can specify a tag (e.g. 'latest') or a version (e.g. '1.2.3'):
 
 ```
-/bundle/[name]@latest
+/[name]@latest
 ```
 
 If you're using these URLs with `<script>` tags, you may need to specify the module's name (i.e. the global variable name used to access it, corresponding to `moduleName` in Rollup and `standalone` in Browserify). packd will guess based on the module ID, but you may need to control it with the `name` query:
 
 ```
-/bundle/underscore?name=_
+/underscore?name=_
 ```
 
 

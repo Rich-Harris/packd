@@ -1,5 +1,15 @@
 # packd changelog
 
+## 2.0.0
+
+* Shorten URLs — `/bundle/foo` is now just `/foo`
+* Move `/log` to `_log` (npm package names cannot start with underscores)
+* Add `/_cache` route for inspecting the cache
+* Filter logs by package name: `/_log?filter=left-pad`
+* Include yarn output in logs
+* Use `modulesOnly` option in rollup-plugin-node-resolve to increase reliability for packages that import CommonJS from ESM ([#2](https://github.com/Rich-Harris/packd/issues/2))
+* Allow deep imports (`/core-js/es6/array.js`)
+
 ## 1.1.0
 
 * Handle packages with `peerDependencies`, e.g. react-dom ([#1](https://github.com/Rich-Harris/packd/issues/1))
