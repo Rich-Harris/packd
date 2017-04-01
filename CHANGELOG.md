@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.1.4
+
+* Update rollup-plugin-node-resolve — fixes #6
+
 ## 2.1.3
 
 * Fix queries with deep imports
