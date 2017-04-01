@@ -4,7 +4,7 @@ const express = require( 'express' );
 const compression = require( 'compression' );
 const favicon = require( 'serve-favicon' );
 const servePackage = require( './serve-package.js' );
-const log = require( './log.js' );
+const logger = require( './logger.js' );
 
 const { root, tmpdir } = require( '../config.js' );
 
@@ -46,7 +46,7 @@ app.use( ( req, res, next ) => {
 	const url = req.originalUrl || req.url;
 	const httpVersion = req.httpVersionMajor + '.' + req.httpVersionMinor;
 
-	log.info( `${remoteAddr} - - [${date}] "${req.method} ${url} HTTP/${httpVersion}"` );
+	logger.info( `${remoteAddr} - - [${date}] "${req.method} ${url} HTTP/${httpVersion}"` );
 	next();
 });
 
@@ -65,5 +65,6 @@ app.get( '/', ( req, res ) => {
 });
 
 app.listen( 9000, () => {
+	logger.log( `started at ${new Date().toUTCString()}` );
 	console.log( 'listening on localhost:9000' );
 });

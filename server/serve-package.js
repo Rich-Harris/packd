@@ -12,7 +12,7 @@ const resolve = require( 'rollup-plugin-node-resolve' );
 const UglifyJS = require( 'uglifyjs' );
 const get = require( './utils/get.js' );
 const makeLegalIdentifier = require( './utils/makeLegalIdentifier' );
-const log = require( './log.js' );
+const logger = require( './logger.js' );
 
 const { root, tmpdir, registry } = require( '../config.js' );
 
@@ -44,7 +44,7 @@ module.exports = function servePackage ( req, res ) {
 	get( `${registry}/${encodeURIComponent( qualified )}` ).then( JSON.parse )
 		.then( pkg => {
 			if ( !pkg.versions ) {
-				log.error( `[${qualified}] invalid module` );
+				logger.error( `[${qualified}] invalid module` );
 
 				res.status( 400 );
 				res.end( 'invalid module' );
@@ -57,7 +57,7 @@ module.exports = function servePackage ( req, res ) {
 				if ( semver.valid( version ) ) {
 					res.redirect( 302, `/bundle/${pkg.name}@${version}${stringify( req.query )}` );
 				} else {
-					log.error( `[${qualified}] invalid tag` );
+					logger.error( `[${qualified}] invalid tag` );
 
 					res.status( 400 );
 					res.end( 'invalid tag' );
@@ -67,7 +67,7 @@ module.exports = function servePackage ( req, res ) {
 			}
 
 			return fetchBundle( pkg, tag, req.query ).then( zipped => {
-				log.info( `[${qualified}] serving ${zipped.length} bytes` );
+				logger.info( `[${qualified}] serving ${zipped.length} bytes` );
 				res.status( 200 );
 				res.set({
 					'Content-Length': zipped.length,
@@ -79,7 +79,7 @@ module.exports = function servePackage ( req, res ) {
 			});
 		})
 		.catch( err => {
-			log.error( `[${qualified}] ${err.message}` );
+			logger.error( `[${qualified}] ${err.message}` );
 			res.status( 500 );
 			res.end( sander.readFileSync( `${root}/server/templates/500.html`, { encoding: 'utf-8' }) );
 		});
@@ -90,17 +90,17 @@ const inProgress = {};
 function fetchBundle ( pkg, version, query ) {
 	const hash = `${pkg.name}@${version}${stringify(query)}`;
 
-	log.info( `[${pkg.name}] requested package` );
+	logger.info( `[${pkg.name}] requested package` );
 
 	if ( cache.has( hash ) ) {
-		log.info( `[${pkg.name}] is cached` );
+		logger.info( `[${pkg.name}] is cached` );
 		return Promise.resolve( cache.get( hash ) );
 	}
 
 	if ( inProgress[ hash ] ) {
-		log.info( `[${pkg.name}] request was already in progress` );
+		logger.info( `[${pkg.name}] request was already in progress` );
 	} else {
-		log.info( `[${pkg.name}] is not cached` );
+		logger.info( `[${pkg.name}] is not cached` );
 
 		const dir = `${tmpdir}/${hash}`;
 		const cwd = `${dir}/package`;
@@ -116,7 +116,7 @@ function fetchBundle ( pkg, version, query ) {
 			.then( () => installDependencies( cwd ) )
 			.then( () => bundle( cwd, query ) )
 			.then( code => {
-				log.info( `[${pkg.name}] minifying` );
+				logger.info( `[${pkg.name}] minifying` );
 
 				let zipped;
 
@@ -124,7 +124,7 @@ function fetchBundle ( pkg, version, query ) {
 					const minified = UglifyJS.minify( code, { fromString: true }).code;
 					zipped = zlib.gzipSync( minified );
 				} catch ( err ) {
-					log.info( `[${pkg.name}] minification failed: ${err.message}` );
+					logger.info( `[${pkg.name}] minification failed: ${err.message}` );
 					zipped = zlib.gzipSync( code );
 				}
 
@@ -145,7 +145,7 @@ function fetchBundle ( pkg, version, query ) {
 function fetchAndExtract ( pkg, version, dir ) {
 	const tarUrl = pkg.versions[ version ].dist.tarball;
 
-	log.info( `[${pkg.name}] fetching ${tarUrl}` );
+	logger.info( `[${pkg.name}] fetching ${tarUrl}` );
 
 	return new Promise( ( fulfil, reject ) => {
 		let timedout = false;
@@ -186,8 +186,13 @@ function exec ( cmd, cwd ) {
 				return reject( err );
 			}
 
-			console.log( stdout );
-			console.error( stderr );
+			stdout.split( '\n' ).forEach( line => {
+				logger.info( line );
+			});
+
+			stderr.split( '\n' ).forEach( line => {
+				logger.info( line );
+			});
 
 			fulfil();
 		});
@@ -196,14 +201,14 @@ function exec ( cmd, cwd ) {
 
 function installDependencies ( cwd ) {
 	const pkg = require( `${cwd}/package.json` );
-	log.info( `[${pkg.name}] running yarn --production` );
+	logger.info( `[${pkg.name}] running yarn --production` );
 
 	return exec( `${root}/node_modules/.bin/yarn --production`, cwd ).then( () => {
 		if ( !pkg.peerDependencies ) return;
 
 		return Object.keys( pkg.peerDependencies ).reduce( ( promise, name ) => {
 			return promise.then( () => {
-				log.info( `[${pkg.name}] installing peer dependency ${name}` );
+				logger.info( `[${pkg.name}] installing peer dependency ${name}` );
 				const version = pkg.peerDependencies[ name ];
 				return exec( `${root}/node_modules/.bin/yarn add ${name}@${version}`, cwd );
 			});
@@ -218,10 +223,10 @@ function bundle ( cwd, query ) {
 	const moduleEntry = pkg.module || pkg[ 'jsnext:main' ];
 
 	if ( moduleEntry ) {
-		log.info( `[${pkg.name}] ES2015 module found, using Rollup` );
+		logger.info( `[${pkg.name}] ES2015 module found, using Rollup` );
 		return bundleWithRollup( cwd, pkg, moduleEntry, moduleName );
 	} else {
-		log.info( `[${pkg.name}] No ES2015 module found, using Browserify` );
+		logger.info( `[${pkg.name}] No ES2015 module found, using Browserify` );
 		const main = path.resolve( cwd, pkg.main || 'index.js' );
 		return bundleWithBrowserify( pkg, main, moduleName );
 	}
@@ -234,10 +239,10 @@ function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
 			resolve({ module: true, jsnext: true, main: false, modulesOnly: true })
 		]
 	}).then( bundle => {
-		log.info( `[${pkg.name}] bundled using Rollup` );
+		logger.info( `[${pkg.name}] bundled using Rollup` );
 
 		if ( bundle.imports.length > 0 ) {
-			log.info( `[${pkg.name}] non-ES2015 dependencies found, handing off to Browserify` );
+			logger.info( `[${pkg.name}] non-ES2015 dependencies found, handing off to Browserify` );
 
 			const intermediate = `${cwd}/__intermediate.js`;
 			return bundle.write({
@@ -267,7 +272,7 @@ function bundleWithBrowserify ( pkg, main, moduleName ) {
 			if ( err ) {
 				reject( err );
 			} else {
-				log.info( `[${pkg.name}] bundled using Browserify` );
+				logger.info( `[${pkg.name}] bundled using Browserify` );
 				fulfil( '' + buf );
 			}
 		});
