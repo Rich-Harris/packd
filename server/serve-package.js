@@ -45,6 +45,8 @@ module.exports = function servePackage ( req, res, next ) {
 	const query = ( queryString || '' )
 		.split( '&' )
 		.reduce( ( query, pair ) => {
+			if ( !pair ) return query;
+
 			const [ key, value ] = pair.split( '=' );
 			query[ key ] = value || true;
 			return query;

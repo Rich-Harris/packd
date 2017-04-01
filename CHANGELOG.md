@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.1.2
+
+* Fix query string parsing
+
 ## 2.1.1
 
 * Fix bug with route matching regex
