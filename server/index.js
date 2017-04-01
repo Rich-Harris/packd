@@ -4,6 +4,7 @@ const express = require( 'express' );
 const compression = require( 'compression' );
 const prettyBytes = require( 'pretty-bytes' );
 const favicon = require( 'serve-favicon' );
+const pkgInfo = require( '../package.json' );
 const padRight = require( './utils/padRight.js' );
 const servePackage = require( './serve-package.js' );
 const logger = require( './logger.js' );
@@ -109,7 +110,7 @@ app.use( express.static( `${root}/public`, {
 app.get( '/', ( req, res ) => {
 	res.status( 200 );
 	const index = fs.readFileSync( `${root}/server/templates/index.html`, 'utf-8' )
-		.replace( '__VERSION__', require( '../package.json' ).version );
+		.replace( '__VERSION__', pkgInfo.version );
 
 	res.end( index );
 });
