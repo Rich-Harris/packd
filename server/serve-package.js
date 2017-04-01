@@ -231,7 +231,7 @@ function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
 	return rollup.rollup({
 		entry: path.resolve( cwd, moduleEntry ),
 		plugins: [
-			resolve({ module: true, jsnext: true, main: false })
+			resolve({ module: true, jsnext: true, main: false, modulesOnly: true })
 		]
 	}).then( bundle => {
 		log.info( `[${pkg.name}] bundled using Rollup` );
