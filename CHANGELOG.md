@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.1.3
+
+* Fix queries with deep imports
+
 ## 2.1.2
 
 * Fix query string parsing
