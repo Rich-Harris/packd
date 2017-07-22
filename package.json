@@ -23,6 +23,7 @@
   "homepage": "https://github.com/Rich-Harris/packd#readme",
   "dependencies": {
     "browserify": "^14.1.0",
+    "compression": "^1.7.0",
     "express": "^4.15.2",
     "is-module": "^1.0.0",
     "lru-cache": "^4.0.2",
@@ -37,11 +38,10 @@
     "serve-favicon": "^2.4.2",
     "tar": "^2.2.1",
     "tar.gz": "^1.0.5",
-    "uglifyjs": "^2.4.10",
+    "uglify-js": "^3.0.25",
     "yarn": "^0.21.3"
   },
   "devDependencies": {
-    "compression": "^1.6.2",
     "eslint": "^3.18.0",
     "now": "^4.10.2",
     "serve-static": "^1.12.1"
