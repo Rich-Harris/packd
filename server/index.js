@@ -13,6 +13,7 @@ const cache = require( './cache.js' );
 const { root, tmpdir } = require( '../config.js' );
 
 const app = express();
+const port = process.env.PORT || 9000;
 
 app.use( favicon( `${root}/public/favicon.ico` ) );
 app.use( compression() );
@@ -119,7 +120,7 @@ app.use( servePackage );
 
 // TODO 404
 
-app.listen( 9000, () => {
+app.listen( port, () => {
 	logger.log( `started at ${new Date().toUTCString()}` );
-	console.log( 'listening on localhost:9000' );
+	console.log( 'listening on localhost:' + port );
 });
