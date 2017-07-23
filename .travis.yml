@@ -19,5 +19,6 @@ deploy:
   region: us-east-1
   app: packd
   env: packd-prod
+  bucket_name: elasticbeanstalk-us-east-1-161663720085
   on:
     branch: master
