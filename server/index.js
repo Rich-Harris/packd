@@ -127,4 +127,5 @@ app.use( servePackage );
 app.listen( port, () => {
 	logger.log( `started at ${new Date().toUTCString()}` );
 	console.log( 'listening on localhost:' + port );
+	process.send( 'start' );
 });

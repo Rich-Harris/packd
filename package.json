@@ -4,7 +4,8 @@
   "description": "Simple alternative to browserify-cdn",
   "scripts": {
     "start": "node server",
-    "deploy": "now && now alias"
+    "deploy": "now && now alias",
+    "test": "node test/test.js"
   },
   "repository": {
     "type": "git",
@@ -29,7 +30,6 @@
     "lru-cache": "^4.0.2",
     "minilog": "^3.1.0",
     "pretty-bytes": "^4.0.2",
-    "request": "^2.81.0",
     "rollup": "^0.41.6",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^1.0.1",
@@ -44,6 +44,8 @@
   "devDependencies": {
     "eslint": "^3.18.0",
     "now": "^4.10.2",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
     "serve-static": "^1.12.1"
   },
   "now": {
