@@ -41,6 +41,10 @@ app.get( '/_log', ( req, res ) => {
 
 app.get( '/_cache', ( req, res ) => {
 	res.status( 200 );
+	res.set({
+		'Content-Type': 'text/plain'
+	});
+
 	res.write( `Total cached bundles: ${prettyBytes( cache.length )}\n` );
 
 	const table = [];
