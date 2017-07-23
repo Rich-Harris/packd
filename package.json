@@ -6,7 +6,8 @@
     "start": "node server",
     "deploy": "now && now alias",
     "deploy:ci": "now --token $NOW_TOKEN && now alias --token $NOW_TOKEN",
-    "test": "node test/test.js"
+    "test": "node test/test.js",
+    "postpublish": "npm run deploy"
   },
   "repository": {
     "type": "git",
