@@ -122,6 +122,7 @@
 			document.querySelector( '.loading' ).classList.add( 'active' );
 
 			const input = document.querySelector( 'input' );
+			window.history.replaceState( {}, '', `/${input.value}` );
 			window.location.href = `/${input.value}`;
 		});
 	</script>
