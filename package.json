@@ -4,8 +4,8 @@
   "description": "Simple alternative to browserify-cdn",
   "scripts": {
     "start": "node server",
-    "deploy": "now && now alias",
-    "deploy:ci": "now --token $NOW_TOKEN && now alias --token $NOW_TOKEN",
+    "deploy": "exit 0 && now && now alias",
+    "deploy:ci": "exit 0 && now --token $NOW_TOKEN && now alias --token $NOW_TOKEN",
     "test": "node test/test.js"
   },
   "repository": {

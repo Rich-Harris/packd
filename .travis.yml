@@ -19,3 +19,5 @@ deploy:
   region: us-east-1
   app: packd
   env: packd-prod
+  on:
+    branch: master
