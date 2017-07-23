@@ -1,22 +1,13 @@
-const path = require( 'path' );
+const { fork } = require( 'child_process' );
 const sander = require( 'sander' );
 const semver = require( 'semver' );
-const targz = require( 'tar.gz' );
 const zlib = require( 'zlib' );
-const request = require( 'request' );
-const child_process = require( 'child_process' );
-const browserify = require( 'browserify' );
-const rollup = require( 'rollup' );
-const resolve = require( 'rollup-plugin-node-resolve' );
-const UglifyJS = require( 'uglify-js' );
-const isModule = require( 'is-module' );
 const get = require( './utils/get.js' );
 const findVersion = require( './utils/findVersion.js' );
-const makeLegalIdentifier = require( './utils/makeLegalIdentifier' );
 const logger = require( './logger.js' );
 const cache = require( './cache.js' );
 
-const { root, tmpdir, registry } = require( '../config.js' );
+const { root, registry } = require( '../config.js' );
 
 function stringify ( query ) {
 	const str = Object.keys( query ).sort().map( key => `${key}=${query[key]}` ).join( '&' );
@@ -120,192 +111,51 @@ function fetchBundle ( pkg, version, deep, query ) {
 	} else {
 		logger.info( `[${pkg.name}] is not cached` );
 
-		const dir = `${tmpdir}/${hash}`;
-		const cwd = `${dir}/package`;
-
-		function cleanup () {
-			inProgress[ hash ] = null;
-			sander.rimraf( dir ); // not returning this, no need to wait
-		}
-
-		inProgress[ hash ] = sander.mkdir( dir )
-			.then( () => fetchAndExtract( pkg, version, dir ) )
-			.then( () => sanitizePkg( cwd ) )
-			.then( () => installDependencies( cwd ) )
-			.then( () => bundle( cwd, deep, query ) )
-			.then( code => {
-				logger.info( `[${pkg.name}] minifying` );
-
-				let zipped;
-
-				try {
-					const minified = UglifyJS.minify( code ).code;
-					zipped = zlib.gzipSync( minified );
-				} catch ( err ) {
-					logger.info( `[${pkg.name}] minification failed: ${err.message}` );
-					zipped = zlib.gzipSync( code );
-				}
-
+		inProgress[ hash ] = createBundle( hash, pkg, version, deep, query )
+			.then( result => {
+				const zipped = zlib.gzipSync( result );
 				cache.set( hash, zipped );
-
-				cleanup();
 				return zipped;
-			})
-			.catch( err => {
-				cleanup();
+			}, err => {
+				inProgress[ hash ] = null;
 				throw err;
+			})
+			.then( zipped => {
+				inProgress[ hash ] = null;
+				return zipped;
 			});
 	}
 
 	return inProgress[ hash ];
 }
 
-function fetchAndExtract ( pkg, version, dir ) {
-	const tarUrl = pkg.versions[ version ].dist.tarball;
-
-	logger.info( `[${pkg.name}] fetching ${tarUrl}` );
-
+function createBundle ( hash, pkg, version, deep, query ) {
 	return new Promise( ( fulfil, reject ) => {
-		let timedout = false;
+		const child = fork( 'server/child-processes/create-bundle.js' );
 
-		const timeout = setTimeout( () => {
-			reject( new Error( 'Request timed out' ) );
-			timedout = true;
-		}, 10000 );
-
-		const input = request( tarUrl );
-
-		// don't like going via the filesystem, but piping into targz
-		// was failing for some weird reason
-		const intermediate = sander.createWriteStream( `${dir}/package.tgz` );
-
-		input.pipe( intermediate );
-
-		intermediate.on( 'close', () => {
-			clearTimeout( timeout );
-
-			if ( !timedout ) {
-				logger.info( `[${pkg.name}] extracting to ${dir}/package` );
-				targz().extract( `${dir}/package.tgz`, dir ).then( fulfil, reject );
-			}
-		});
-	});
-}
-
-function sanitizePkg ( cwd ) {
-	const pkg = require( `${cwd}/package.json` );
-	pkg.scripts = {};
-	return sander.writeFile( `${cwd}/package.json`, JSON.stringify( pkg, null, '  ' ) );
-}
-
-function exec ( cmd, cwd, pkg ) {
-	return new Promise( ( fulfil, reject ) => {
-		child_process.exec( cmd, { cwd }, ( err, stdout, stderr ) => {
-			if ( err ) {
-				return reject( err );
+		child.on( 'message', message => {
+			if ( message === 'ready' ) {
+				child.send({
+					type: 'start',
+					params: { hash, pkg, version, deep, query }
+				});
 			}
 
-			stdout.split( '\n' ).forEach( line => {
-				logger.info( `[${pkg.name}] ${line}` );
-			});
+			if ( message.type === 'info' ) {
+				logger.info( message.message );
+			}
 
-			stderr.split( '\n' ).forEach( line => {
-				logger.info( `[${pkg.name}] ${line}` );
-			});
+			else if ( message.type === 'error' ) {
+				const error = new Error( message.message );
+				error.stack = message.stack;
 
-			fulfil();
-		});
-	});
-}
+				reject( error );
+				child.kill();
+			}
 
-function installDependencies ( cwd ) {
-	const pkg = require( `${cwd}/package.json` );
-	logger.info( `[${pkg.name}] running npm install --production` );
-
-	return exec( `${root}/node_modules/.bin/npm install --production`, cwd, pkg ).then( () => {
-		if ( !pkg.peerDependencies ) return;
-
-		return Object.keys( pkg.peerDependencies ).reduce( ( promise, name ) => {
-			return promise.then( () => {
-				logger.info( `[${pkg.name}] installing peer dependency ${name}` );
-				const version = pkg.peerDependencies[ name ];
-				return exec( `${root}/node_modules/.bin/npm install ${name}@${version}`, cwd, pkg );
-			});
-		}, Promise.resolve() );
-	});
-}
-
-function bundle ( cwd, deep, query ) {
-	const pkg = require( `${cwd}/package.json` );
-	const moduleName = query.name || makeLegalIdentifier( pkg.name );
-
-	const entry = deep ?
-		path.resolve( cwd, deep ) :
-		findEntry( path.resolve( cwd, ( pkg.module || pkg[ 'jsnext:main' ] || pkg.main || 'index.js' ) ) );
-
-	const code = sander.readFileSync( entry, { encoding: 'utf-8' });
-
-	if ( isModule( code ) ) {
-		logger.info( `[${pkg.name}] ES2015 module found, using Rollup` );
-		return bundleWithRollup( cwd, pkg, entry, moduleName );
-	} else {
-		logger.info( `[${pkg.name}] No ES2015 module found, using Browserify` );
-		return bundleWithBrowserify( pkg, entry, moduleName );
-	}
-}
-
-function findEntry ( file ) {
-	try {
-		const stats = sander.statSync( file );
-		if ( stats.isDirectory() ) return `${file}/index.js`;
-		return file;
-	} catch ( err ) {
-		return `${file}.js`;
-	}
-}
-
-function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
-	return rollup.rollup({
-		entry: path.resolve( cwd, moduleEntry ),
-		plugins: [
-			resolve({ module: true, jsnext: true, main: false, modulesOnly: true })
-		]
-	}).then( bundle => {
-		logger.info( `[${pkg.name}] bundled using Rollup` );
-
-		if ( bundle.imports.length > 0 ) {
-			logger.info( `[${pkg.name}] non-ES2015 dependencies found, handing off to Browserify` );
-
-			const intermediate = `${cwd}/__intermediate.js`;
-			return bundle.write({
-				dest: intermediate,
-				format: 'cjs'
-			}).then( () => {
-				return bundleWithBrowserify( pkg, intermediate, moduleName );
-			});
-		}
-
-		else {
-			return bundle.generate({
-				format: 'umd',
-				moduleName
-			}).code;
-		}
-	});
-}
-
-function bundleWithBrowserify ( pkg, main, moduleName ) {
-	const b = browserify( main, {
-		standalone: moduleName
-	});
-
-	return new Promise( ( fulfil, reject ) => {
-		b.bundle( ( err, buf ) => {
-			if ( err ) {
-				reject( err );
-			} else {
-				logger.info( `[${pkg.name}] bundled using Browserify` );
-				fulfil( '' + buf );
+			else if ( message.type === 'result' ) {
+				fulfil( message.result );
+				child.kill();
 			}
 		});
 	});
