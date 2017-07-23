@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.3.0
+
+* Do bundling and minification in a child process ([#11](https://github.com/Rich-Harris/packd/issues/11))
+
 ## 2.2.1
 
 * Only send `start` message if process is a fork

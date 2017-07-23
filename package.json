@@ -1,6 +1,6 @@
 {
   "name": "packd",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Simple alternative to browserify-cdn",
   "scripts": {
     "start": "node server",
