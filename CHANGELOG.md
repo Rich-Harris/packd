@@ -1,5 +1,11 @@
 # packd changelog
 
+## 2.2.0
+
+* Expose port ([#16](https://github.com/Rich-Harris/packd/pull/16))
+* Fix UglifyJS dependency ([#16](https://github.com/Rich-Harris/packd/pull/16))
+* Fix content type on `/_cache`
+
 ## 2.1.4
 
 * Update rollup-plugin-node-resolve — fixes #6
