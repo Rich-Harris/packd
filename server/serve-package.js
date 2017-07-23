@@ -139,7 +139,7 @@ function fetchBundle ( pkg, version, deep, query ) {
 				let zipped;
 
 				try {
-					const minified = UglifyJS.minify( code, { fromString: true }).code;
+					const minified = UglifyJS.minify( code ).code;
 					zipped = zlib.gzipSync( minified );
 				} catch ( err ) {
 					logger.info( `[${pkg.name}] minification failed: ${err.message}` );
