@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.2.1
+
+* Only send `start` message if process is a fork
+
 ## 2.2.0
 
 * Expose port ([#16](https://github.com/Rich-Harris/packd/pull/16))
