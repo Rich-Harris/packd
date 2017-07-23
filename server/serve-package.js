@@ -8,7 +8,7 @@ const child_process = require( 'child_process' );
 const browserify = require( 'browserify' );
 const rollup = require( 'rollup' );
 const resolve = require( 'rollup-plugin-node-resolve' );
-const UglifyJS = require( 'uglifyjs' );
+const UglifyJS = require( 'uglify-js' );
 const isModule = require( 'is-module' );
 const get = require( './utils/get.js' );
 const findVersion = require( './utils/findVersion.js' );
@@ -139,7 +139,7 @@ function fetchBundle ( pkg, version, deep, query ) {
 				let zipped;
 
 				try {
-					const minified = UglifyJS.minify( code, { fromString: true }).code;
+					const minified = UglifyJS.minify( code ).code;
 					zipped = zlib.gzipSync( minified );
 				} catch ( err ) {
 					logger.info( `[${pkg.name}] minification failed: ${err.message}` );
