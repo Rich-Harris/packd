@@ -1,5 +1,10 @@
 # packd changelog
 
+## 2.3.1
+
+* Use `pushState` instead of `replaceState` on `/`
+* Update to new Rollup API
+
 ## 2.3.0
 
 * Do bundling and minification in a child process ([#11](https://github.com/Rich-Harris/packd/issues/11))
