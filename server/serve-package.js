@@ -220,16 +220,16 @@ function exec ( cmd, cwd, pkg ) {
 
 function installDependencies ( cwd ) {
 	const pkg = require( `${cwd}/package.json` );
-	logger.info( `[${pkg.name}] running yarn --production` );
+	logger.info( `[${pkg.name}] running npm install --production` );
 
-	return exec( `${root}/node_modules/.bin/yarn --production`, cwd, pkg ).then( () => {
+	return exec( `${root}/node_modules/.bin/npm install --production`, cwd, pkg ).then( () => {
 		if ( !pkg.peerDependencies ) return;
 
 		return Object.keys( pkg.peerDependencies ).reduce( ( promise, name ) => {
 			return promise.then( () => {
 				logger.info( `[${pkg.name}] installing peer dependency ${name}` );
 				const version = pkg.peerDependencies[ name ];
-				return exec( `${root}/node_modules/.bin/yarn add ${name}@${version}`, cwd, pkg );
+				return exec( `${root}/node_modules/.bin/npm install ${name}@${version}`, cwd, pkg );
 			});
 		}, Promise.resolve() );
 	});
