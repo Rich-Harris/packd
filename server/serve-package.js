@@ -7,7 +7,7 @@ const findVersion = require( './utils/findVersion.js' );
 const logger = require( './logger.js' );
 const cache = require( './cache.js' );
 
-const { root, tmpdir, registry } = require( '../config.js' );
+const { root, registry } = require( '../config.js' );
 
 function stringify ( query ) {
 	const str = Object.keys( query ).sort().map( key => `${key}=${query[key]}` ).join( '&' );

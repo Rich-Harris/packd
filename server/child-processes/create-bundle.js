@@ -142,34 +142,34 @@ function findEntry ( file ) {
 	}
 }
 
-function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
-	return rollup.rollup({
+async function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
+	const bundle = await rollup.rollup({
 		entry: path.resolve( cwd, moduleEntry ),
 		plugins: [
 			resolve({ module: true, jsnext: true, main: false, modulesOnly: true })
 		]
-	}).then( bundle => {
-		info( `[${pkg.name}] bundled using Rollup` );
-
-		if ( bundle.imports.length > 0 ) {
-			info( `[${pkg.name}] non-ES2015 dependencies found, handing off to Browserify` );
-
-			const intermediate = `${cwd}/__intermediate.js`;
-			return bundle.write({
-				dest: intermediate,
-				format: 'cjs'
-			}).then( () => {
-				return bundleWithBrowserify( pkg, intermediate, moduleName );
-			});
-		}
-
-		else {
-			return bundle.generate({
-				format: 'umd',
-				moduleName
-			}).code;
-		}
 	});
+
+	info( `[${pkg.name}] bundled using Rollup` );
+
+	if ( bundle.imports.length > 0 ) {
+		info( `[${pkg.name}] non-ES2015 dependencies found, handing off to Browserify` );
+
+		const intermediate = `${cwd}/__intermediate.js`;
+		return bundle.write({
+			dest: intermediate,
+			format: 'cjs'
+		}).then( () => {
+			return bundleWithBrowserify( pkg, intermediate, moduleName );
+		});
+	}
+
+	else {
+		return bundle.generate({
+			format: 'umd',
+			moduleName
+		}).code;
+	}
 }
 
 function bundleWithBrowserify ( pkg, main, moduleName ) {
