@@ -165,10 +165,12 @@ async function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
 	}
 
 	else {
-		return bundle.generate({
+		const { code } = await bundle.generate({
 			format: 'umd',
 			moduleName
-		}).code;
+		});
+
+		return code;
 	}
 }
 
