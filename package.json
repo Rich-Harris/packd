@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node server",
     "deploy": "now && now alias",
+    "deploy:ci": "now --token $NOW_TOKEN && now alias --token $NOW_TOKEN",
     "test": "node test/test.js"
   },
   "repository": {
