@@ -1,12 +1,21 @@
 sudo: false
 language: node_js
 node_js:
-  - "stable"
+- stable
 env:
   global:
-    - BUILD_TIMEOUT=10000
+  - BUILD_TIMEOUT=10000
 install: npm install
-after_success: if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm run deploy:ci; fi
+after_success: if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm run deploy:ci;
+  fi
 branches:
   only:
   - master
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: AKIAJEB6I7DQIVB4XLAQ
+  secret_access_key:
+    secure: CUktHCze13QCvxL87HFtxZf/J+d+UZX/31pfPuX/rGac2sg8C12rXckT8zAXZJFclze2wFxlSDirBfz/ASPpchYiAJ/tg88jfYt27hznOIRyXX+p9916JoEVLIwG6OpiNneekwgL0g27FAGaqE8ktjbmfYykcrTcHJbj7DeBK6OsEnN1HhgJltkIXkN/+fDT9oyavSyfYO+lXQs+IdfLDN6uP/JiyUEODpDUNq5bAO4jJnqXEOONx1afGxXOC1y2O8vZNZMZ+/VgpuSjk2xBdVsSAIFwUbk3ASu+a0Dhop7krHV+85FO+TNzyeQ1N6+qkgnsp32C3VE99GglJZrG8FjTqp3BtW0bK7xb5gl1+2mFx2I0YXDvS7PW+6ekAmkL6kZCsqMG9PJchGAM+5b4Dr4rUyBJGW6hY6Bk3t1SwaM5FBwc2nIb1I/Mz8jfZbnLMt6DIMs+IawF+Wt+V4jAbOodTg7yimlmOTYMNgk9H4nubGCTgZ+wB2xpsw1Lw1QRNvcNGhcLCa6CuXfCUbrTkgovS/nGxK5CK7cT54P+o4qGWfYnLPevfPD4p9jvihLUP/3npnQUX4JkMqU2tJJu0wQhmvqEy/e6UDUQubIXZGnS7nONkJT5IRJS4zo1uasr/Bvlssm9wGBJNYkbcIJRTDWse/qfwHtTbNGx7WUVwss=
+  region: us-east-1
+  app: packd
+  env: packd-prod
