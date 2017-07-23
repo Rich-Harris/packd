@@ -6,7 +6,7 @@ env:
   global:
     - BUILD_TIMEOUT=10000
 install: npm install
-after_success: npm run deploy:ci
+after_success: if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm run deploy:ci; fi
 branches:
   only:
   - master
