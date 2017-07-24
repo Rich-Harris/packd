@@ -34,18 +34,15 @@ async function createBundle ({ hash, pkg, version, deep, query }) {
 
 		info( `[${pkg.name}] minifying` );
 
-		let result;
+		const result = UglifyJS.minify( code );
 
-		try {
-			result = UglifyJS.minify( code ).code;
-		} catch ( err ) {
-			info( `[${pkg.name}] minification failed: ${err.message}` );
-			result = code;
+		if ( result.error ) {
+			info( `[${pkg.name}] minification failed: ${result.error.message}` );
 		}
 
 		process.send({
 			type: 'result',
-			result
+			code: result.error ? code : result.code
 		});
 	} catch ( err ) {
 		process.send({

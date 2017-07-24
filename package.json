@@ -5,7 +5,6 @@
   "scripts": {
     "start": "node server",
     "deploy": "now && now alias",
-    "deploy:ci": "now --token $NOW_TOKEN && now alias --token $NOW_TOKEN",
     "test": "node test/test.js",
     "postpublish": "npm run deploy"
   },
@@ -45,7 +44,6 @@
   },
   "devDependencies": {
     "eslint": "^4.3.0",
-    "now": "^7.2.4",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "serve-static": "^1.12.1"
