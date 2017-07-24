@@ -40,12 +40,12 @@
     "serve-favicon": "^2.4.2",
     "tar": "^3.1.5",
     "tar.gz": "^1.0.5",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
     "uglify-js": "^3.0.25"
   },
   "devDependencies": {
     "eslint": "^4.3.0",
-    "request": "^2.81.0",
-    "request-promise": "^4.2.1",
     "serve-static": "^1.12.1"
   },
   "now": {
