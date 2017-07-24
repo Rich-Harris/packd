@@ -154,7 +154,7 @@ function createBundle ( hash, pkg, version, deep, query ) {
 			}
 
 			else if ( message.type === 'result' ) {
-				fulfil( message.result );
+				fulfil( message.code );
 				child.kill();
 			}
 		});
