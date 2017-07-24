@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.3.2
+
+* Update to new Uglify API
+
 ## 2.3.1
 
 * Use `pushState` instead of `replaceState` on `/`
