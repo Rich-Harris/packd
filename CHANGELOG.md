@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.3.4
+
+* Fix package-lock.json
+
 ## 2.3.3
 
 * Move some `devDependencies` to `dependencies`, where they belong ([#20](https://github.com/Rich-Harris/packd/pull/20))
