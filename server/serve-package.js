@@ -88,7 +88,10 @@ module.exports = function servePackage ( req, res, next ) {
 		.catch( err => {
 			logger.error( `[${qualified}] ${err.message}` );
 			res.status( 500 );
-			res.end( sander.readFileSync( `${root}/server/templates/500.html`, { encoding: 'utf-8' }) );
+			const page = sander.readFileSync( `${root}/server/templates/500.html`, { encoding: 'utf-8' })
+				.replace( '__ERROR__', err.message );
+
+			res.end( page );
 		});
 };
 
