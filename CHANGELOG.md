@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.4.0
+
+* Show error message on 500 page ([#24](https://github.com/Rich-Harris/packd/pull/24))
+
 ## 2.3.4
 
 * Fix package-lock.json
