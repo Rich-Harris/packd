@@ -6,8 +6,9 @@ const get = require( './utils/get.js' );
 const findVersion = require( './utils/findVersion.js' );
 const logger = require( './logger.js' );
 const cache = require( './cache.js' );
+const etag = require('etag');
 
-const { root, registry } = require( '../config.js' );
+const { root, registry, additionalBundleResHeaders } = require( '../config.js' );
 
 function stringify ( query ) {
 	const str = Object.keys( query ).sort().map( key => `${key}=${query[key]}` ).join( '&' );
@@ -76,12 +77,15 @@ module.exports = function servePackage ( req, res, next ) {
 			return fetchBundle( meta, tag, deep, query ).then( zipped => {
 				logger.info( `[${qualified}] serving ${zipped.length} bytes` );
 				res.status( 200 );
-				res.set({
+				res.set(Object.assign({
 					'Content-Length': zipped.length,
 					'Content-Type': 'application/javascript',
 					'Content-Encoding': 'gzip',
-					'Cache-Control': 'max-age=86400'
-				});
+					
+				}, additionalBundleResHeaders));
+
+				// FIXME(sven): calculate the etag based on the original content
+				res.setHeader('ETag', etag(zipped))
 				res.end( zipped );
 			});
 		})
