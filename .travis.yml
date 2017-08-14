@@ -8,9 +8,9 @@ env:
 install: npm install
 after_success: if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm run deploy:ci;
   fi
-branches:
-  only:
-  - master
+# branches:
+#   only:
+#   - master
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIAILFVEK456IRXIXIA
@@ -20,5 +20,5 @@ deploy:
   app: packd
   env: packd-prod
   bucket_name: elasticbeanstalk-us-east-1-161663720085
-  on:
-    branch: master
+  # on:
+  #   branch: master
