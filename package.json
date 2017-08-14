@@ -1,12 +1,12 @@
 {
   "name": "packd",
-  "version": "2.2.1",
+  "version": "2.5.0",
   "description": "Simple alternative to browserify-cdn",
   "scripts": {
     "start": "node server",
     "deploy": "exit 0 && now && now alias",
-    "deploy:ci": "exit 0 && now --token $NOW_TOKEN && now alias --token $NOW_TOKEN",
-    "test": "node test/test.js"
+    "test": "exit 0 && node test/test.js",
+    "postpublish": "npm run deploy"
   },
   "repository": {
     "type": "git",
@@ -26,28 +26,27 @@
   "dependencies": {
     "browserify": "^14.1.0",
     "compression": "^1.7.0",
+    "etag": "^1.8.0",
     "express": "^4.15.2",
     "is-module": "^1.0.0",
     "lru-cache": "^4.0.2",
     "minilog": "^3.1.0",
     "npm": "^5.3.0",
     "pretty-bytes": "^4.0.2",
-    "rollup": "^0.41.6",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
+    "rollup": "^0.45.2",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-uglify": "^1.0.1",
+    "rollup-plugin-uglify": "^2.0.1",
     "sander": "^0.6.0",
     "semver": "^5.3.0",
     "serve-favicon": "^2.4.2",
-    "tar": "^2.2.1",
+    "tar": "^3.1.5",
     "tar.gz": "^1.0.5",
     "uglify-js": "^3.0.25"
   },
   "devDependencies": {
-    "eslint": "^3.18.0",
-    "now": "^4.10.2",
-    "request": "^2.81.0",
-    "request-promise": "^4.2.1",
-    "serve-static": "^1.12.1"
+    "eslint": "^4.3.0"
   },
   "now": {
     "alias": "packd",

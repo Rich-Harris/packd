@@ -1,5 +1,34 @@
 # packd changelog
 
+## 2.5.0
+
+* Improve caching ([#26](https://github.com/Rich-Harris/packd/pull/26))
+
+## 2.4.0
+
+* Show error message on 500 page ([#24](https://github.com/Rich-Harris/packd/pull/24))
+
+## 2.3.4
+
+* Fix package-lock.json
+
+## 2.3.3
+
+* Move some `devDependencies` to `dependencies`, where they belong ([#20](https://github.com/Rich-Harris/packd/pull/20))
+
+## 2.3.2
+
+* Update to new Uglify API
+
+## 2.3.1
+
+* Use `pushState` instead of `replaceState` on `/`
+* Update to new Rollup API
+
+## 2.3.0
+
+* Do bundling and minification in a child process ([#11](https://github.com/Rich-Harris/packd/issues/11))
+
 ## 2.2.1
 
 * Only send `start` message if process is a fork
