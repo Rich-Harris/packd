@@ -84,7 +84,7 @@ module.exports = function servePackage ( req, res, next ) {
 					
 				}, additionalBundleResHeaders));
 
-				// FIXME(sven): calculated the etag based on the original content
+				// FIXME(sven): calculate the etag based on the original content
 				res.setHeader('ETag', etag(zipped))
 				res.end( zipped );
 			});
