@@ -8,7 +8,7 @@ const server = fork('server/index.js', ['start'], {
 });
 
 async function getPackage(id) {
-	const zipped = await request('http://localhost:9000/left-pad', {
+	const zipped = await request(`http://localhost:9000/${id}`, {
 		encoding: null
 	});
 
@@ -30,6 +30,9 @@ server.on('message', async message => {
 
 	const leftPad = await getPackage('left-pad');
 	assert.equal(leftPad('x', 3), '  x');
+
+	const theAnswer = await getPackage('the-answer');
+	assert.equal(theAnswer, 42);
 
 	success('all tests pass');
 	server.kill();
