@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.5.0
+
+* Improve caching ([#26](https://github.com/Rich-Harris/packd/pull/26))
+
 ## 2.4.0
 
 * Show error message on 500 page ([#24](https://github.com/Rich-Harris/packd/pull/24))
