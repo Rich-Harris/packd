@@ -10,7 +10,7 @@ const UglifyJS = require( 'uglify-js' );
 const isModule = require( 'is-module' );
 const makeLegalIdentifier = require( '../utils/makeLegalIdentifier' );
 
-const { root, tmpdir } = require( '../../config.js' );
+const { npmInstallEnvVars, root, tmpdir } = require( '../../config.js' );
 
 process.on( 'message', message => {
 	if ( message.type === 'start' ) {
@@ -95,9 +95,13 @@ function sanitizePkg ( cwd ) {
 
 function installDependencies ( cwd ) {
 	const pkg = require( `${cwd}/package.json` );
-	info( `[${pkg.name}] running npm install --production` );
 
-	return exec( `${root}/node_modules/.bin/npm install --production`, cwd, pkg ).then( () => {
+	const envVariables = npmInstallEnvVars.join(" ")
+	const installCommand = `${envVariables} ${root}/node_modules/.bin/npm install --production`;
+
+	info( `[${pkg.name}] running ${installCommand}` );
+
+	return exec( installCommand, cwd, pkg ).then( () => {
 		if ( !pkg.peerDependencies ) return;
 
 		return Object.keys( pkg.peerDependencies ).reduce( ( promise, name ) => {
