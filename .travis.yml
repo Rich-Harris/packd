@@ -13,7 +13,6 @@ after_success: if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm run deploy:ci
 #   - master
 deploy:
   provider: elasticbeanstalk
-  skip_cleanup: true
   access_key_id: AKIAILFVEK456IRXIXIA
   secret_access_key:
     secure: fJxQqPkKF0vxT57RR+NKR936fIgmyVH72bT6RM7Vj9Q5wU8l45QEgog+h7NWDm+u9a65PtpbtqskLWJt2v3E9hi8skrkKY+2SJGEK2Obqzba4b77QV1+2Znrb9Vp1pcWETHkPYGpcsTlAiraQDnpTJSvnzsOp+/x7kXMsi4BT8pFOPqyVtcKjuxXah6bCjiROQZo7sSuaii2ppwiKu9C0IRANCyaW3kpYQBIvUv/ntn1SQHTOPDpcyGP2DTNR5LzISTmkcqOPzVL6DhyIvxR5jbA2yoVXpbP0iV4HBfXMdClJ5g/RWETxiTSMKSrp5M3Tq2AX6r06mvNRByZjytrsPEMJs8u2g5Eph27eRj9OwBtzezuDqz1ewfTR1ol40TwVrtNEqwVFhxeli2RB7ly3CaDuf60WwyJAd0uHyTocBQVQMKmgHSLxqmeAWNgkRCKBD6nEcB3/Zf8xVmJGTd2p7+0qqvH0RWWqGy/u7KubWGI4zKbowzlbRj8VI7EUiBnZO7H6oe2fItYDhfEHodQLqFmUNMeACLf6EtKMDZaPPJfNC7ze/KVYmoYlaqZpwTLw+UCIaClzWUJXFJ+hk1NPemNElUARUQ3hFP58bCA+jqelBPehujt8/Wud0vdscdHicPMfqDdY2KgOGyRE3fy1ufScEJnCegfECbRtRkFXis=
