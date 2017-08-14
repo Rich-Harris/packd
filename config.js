@@ -21,8 +21,7 @@ exports.additionalBundleResHeaders = {
 	'Cache-Control': 'max-age=86400',
 };
 
-// if (process.env.AWS) {
-if (true) {
+if (process.env.AWS) {
 	const cacheExpiration = 60 * 60 * 24 * 365
 	exports.npmInstallEnvVars = ["npm_config_cache=~/.npm"];
 	exports.debugEndpoints = false;
