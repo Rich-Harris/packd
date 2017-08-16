@@ -1,9 +1,23 @@
 sudo: false
 language: node_js
 node_js:
-  - "stable"
+  - stable
 env:
   global:
     - BUILD_TIMEOUT=10000
     - NODE_ENV=production
 install: npm install
+
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: AKIAJX4HOIEXUAHVC77A
+  secret_access_key:
+    secure: Jo7CdQvF7ZShMgs9MW+oUKozfdLiR+g8N+6E/g+T5u+9HarzR0VdvJMBxlm1BlU6t3kUdeT1RShMlhb9a2bbWNEZFjWlz9PFXRgGa4w79ezGGYIufO4uNDyilvR1jGkwFONEStMQwO6qyL4TS4LzvRe9aoNSIccYXsanSSFxXQ619shoq47y3zSxKcMhpWCkNENFPWmmaJGUtenM/RQC5Pg3JJE+O86yLKQcf0kWSVi83fx3LH1yl9Y52sjutJ1p8BVRcAf//+6tUiAG9cHedRfnPpq81rOhZufSSE/nMF7VpheXfkU0js1KfeFCP5qQ9N8A5ps6sjuUCBbFDHU4ASxqeL/PhfDBwfNGUkLKyrZClDvG/mvz04DzxF5VZjyL273nXxHYjDPlcf6e1BLdYuMYIMuiXJnjRu55G9fCVJdA4BumpWsVaVA6tP9+2TcKWnCa7fvKJDOSxzqfikww+cTQPWzfvzJJO6hzc1REWWZ6VqLk5s5GktfbeJ2CHR9lUlWmAj0GDEzSJdONTCcvWR4zNFUOmK77dTwFCVld8dn/6m1fasNLELAT5tCJvHuQ98GWdqlsNPslcbsj3FeA46+uSyR5458TAh5rbyIKvAqcaI4snCCqejStpAUVqOhiBKAI0V315RI55Y1iDDid7V2PDEOm1bZe/6876zQ0JsQ=
+  region: us-east-1
+  app: packd
+  env: packd-prod
+  bucket_name: elasticbeanstalk-us-east-1-161663720085
+  bucket_path: packd
+  on:
+      tags: true
+
