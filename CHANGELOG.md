@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.5.1
+
+* Don't try to spellcheck package names ([#29](https://github.com/Rich-Harris/packd/pull/29))
+
 ## 2.5.0
 
 * Improve caching ([#26](https://github.com/Rich-Harris/packd/pull/26))
