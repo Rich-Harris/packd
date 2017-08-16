@@ -1,13 +1,13 @@
 sudo: false
 language: node_js
 node_js:
-- stable
+  - stable
 env:
   global:
-  - BUILD_TIMEOUT=10000
+    - BUILD_TIMEOUT=10000
+    - NODE_ENV=production
 install: npm install
-after_success: if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm run deploy:ci;
-  fi
+
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIAJX4HOIEXUAHVC77A

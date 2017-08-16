@@ -4,8 +4,8 @@
   "description": "Simple alternative to browserify-cdn",
   "scripts": {
     "start": "node server",
-    "deploy": "exit 0 && now && now alias",
-    "test": "exit 0 && node test/test.js",
+    "deploy": "now && now alias",
+    "test": "node test/test.js",
     "postpublish": "npm run deploy"
   },
   "repository": {
