@@ -19,4 +19,5 @@ deploy:
   bucket_name: elasticbeanstalk-us-east-1-161663720085
   bucket_path: packd
   on:
-    branch: dpl-aws-eb
+      tags: true
+
