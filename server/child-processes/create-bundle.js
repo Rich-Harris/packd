@@ -1,7 +1,7 @@
 const path = require( 'path' );
 const sander = require( 'sander' );
 const child_process = require( 'child_process' );
-const targz = require( 'tar.gz' );
+const tar = require( 'tar' );
 const request = require( 'request' );
 const browserify = require( 'browserify' );
 const rollup = require( 'rollup' );
@@ -81,7 +81,13 @@ function fetchAndExtract ( pkg, version, dir ) {
 
 			if ( !timedout ) {
 				info( `[${pkg.name}] extracting to ${dir}/package` );
-				targz().extract( `${dir}/package.tgz`, dir ).then( fulfil, reject );
+
+				tar
+					.x({
+						file: `${dir}/package.tgz`,
+						cwd: dir,
+					})
+					.then( fulfil, reject );
 			}
 		});
 	});
@@ -96,7 +102,7 @@ function sanitizePkg ( cwd ) {
 function installDependencies ( cwd ) {
 	const pkg = require( `${cwd}/package.json` );
 
-	const envVariables = npmInstallEnvVars.join(" ")
+	const envVariables = npmInstallEnvVars.join(" ");
 	const installCommand = `${envVariables} ${root}/node_modules/.bin/npm install --production`;
 
 	info( `[${pkg.name}] running ${installCommand}` );

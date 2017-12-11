@@ -41,8 +41,7 @@
     "sander": "^0.6.0",
     "semver": "^5.3.0",
     "serve-favicon": "^2.4.2",
-    "tar": "^3.1.5",
-    "tar.gz": "^1.0.5",
+    "tar": "^3.2.1",
     "uglify-js": "^3.0.25"
   },
   "devDependencies": {
