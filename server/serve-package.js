@@ -44,7 +44,7 @@ module.exports = function servePackage ( req, res, next ) {
 			return query;
 		}, {} );
 
-	get( `${registry}/${encodeURIComponent( qualified )}` ).then( JSON.parse )
+	get( `${registry}/${encodeURIComponent( qualified ).replace('%40', '@')}` ).then( JSON.parse )
 		.then( meta => {
 			if ( !meta.versions ) {
 				logger.error( `[${qualified}] invalid module` );
