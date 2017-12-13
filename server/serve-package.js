@@ -79,7 +79,7 @@ module.exports = function servePackage ( req, res, next ) {
 				res.status( 200 );
 				res.set(Object.assign({
 					'Content-Length': zipped.length,
-					'Content-Type': 'application/javascript',
+					'Content-Type': 'application/javascript; charset=utf-8',
 					'Content-Encoding': 'gzip',
 					
 				}, additionalBundleResHeaders));
