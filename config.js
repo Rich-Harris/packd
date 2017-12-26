@@ -22,7 +22,7 @@ exports.additionalBundleResHeaders = {
 };
 
 if (process.env.AWS) {
-	const cacheExpiration = 60 * 60 * 24 * 365
+	const cacheExpiration = 60 * 60 * 24 * 365;
 	exports.npmInstallEnvVars = ["npm_config_cache=~/.npm"];
 	exports.debugEndpoints = false;
 	exports.additionalBundleResHeaders = {
