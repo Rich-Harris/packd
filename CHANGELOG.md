@@ -1,5 +1,18 @@
 # packd changelog
 
+
+## 2.6.1
+
+* Add UTF8 header ([#36](https://github.com/Rich-Harris/packd/pull/36))
+
+## 2.6.0
+
+* Fix registry URL for scoped packages ([#35](https://github.com/Rich-Harris/packd/pull/35))
+
+## 2.5.3
+
+* Use `tar` module ([#34](https://github.com/Rich-Harris/packd/pull/34))
+
 ## 2.5.2
 
 * Bump tag to trigger AWS deploy
