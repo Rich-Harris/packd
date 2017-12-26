@@ -7,7 +7,7 @@ const server = fork('server/index.js', ['start'], {
 	stdio: 'inherit'
 });
 
-async function getPackage(id) {
+async function getPackage (id) {
 	const zipped = await request(`http://localhost:9000/${id}`, {
 		encoding: null
 	});
@@ -21,7 +21,7 @@ async function getPackage(id) {
 	return mod.exports;
 }
 
-function success(message) {
+function success (message) {
 	console.log(`\u001B[32m✓\u001B[39m ${message}`);
 }
 
