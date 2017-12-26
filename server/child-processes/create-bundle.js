@@ -48,7 +48,7 @@ async function createBundle ({ hash, pkg, version, deep, query }) {
 		process.send({
 			type: 'error',
 			message: err.message,
-			stack: err.message
+			stack: err.stack
 		});
 	}
 
