@@ -114,7 +114,7 @@ function installDependencies ( cwd ) {
 			return promise.then( () => {
 				info( `[${pkg.name}] installing peer dependency ${name}` );
 				const version = pkg.peerDependencies[ name ];
-				return exec( `${root}/node_modules/.bin/npm install ${name}@${version}`, cwd, pkg );
+				return exec( `${root}/node_modules/.bin/npm install "${name}@${version}"`, cwd, pkg );
 			});
 		}, Promise.resolve() );
 	});
