@@ -3,7 +3,7 @@ const sander = require( 'sander' );
 
 exports.root = path.resolve( __dirname );
 exports.tmpdir = process.env.NOW ? `/tmp` : `${exports.root}/.tmp`;
-exports.registry = `http://registry.npmjs.org`;
+exports.registry = 'https://registry.npmjs.org';
 
 if ( !process.env.NOW ) {
 	try {
