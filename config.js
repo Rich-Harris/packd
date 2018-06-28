@@ -30,8 +30,17 @@ if (process.env.AWS) {
 		'X-Content-Type-Options': 'nosniff',
 		'Access-Control-Allow-Origin': '*',
 		'Access-Control-Request-Method': 'GET',
-		'X-Powered-By': 'https://github.com/rich-Harris/packd',
+		'X-Powered-By': 'https://github.com/rich-harris/packd',
 		'Strict-Transport-Security': `max-age=${cacheExpiration}; includeSubDomains; preload`,
+	};
+
+	exports.onBadRequest = function (res) {
+		res.status( 200 );
+	};
+
+	exports.onError = function (res) {
+		// error will be propagated in the logs
+		res.status( 200 );
 	};
 }
 
