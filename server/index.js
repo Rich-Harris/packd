@@ -124,8 +124,6 @@ app.get( '/', ( req, res ) => {
 
 app.use( servePackage );
 
-// TODO 404
-
 app.listen( port, () => {
 	logger.log( `started at ${new Date().toUTCString()}` );
 	console.log( 'listening on localhost:' + port );

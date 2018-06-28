@@ -9,6 +9,7 @@ const cache = require( './cache.js' );
 const etag = require('etag');
 const sha1 = require('sha1');
 
+const { sendBadRequest, sendError } = require( './utils/responses.js' );
 const { root, registry, additionalBundleResHeaders } = require( '../config.js' );
 
 function stringify ( query ) {
@@ -23,9 +24,7 @@ module.exports = function servePackage ( req, res, next ) {
 
 	if ( !match ) {
 		// TODO make this prettier
-		res.status( 400 );
-		res.end( 'Invalid module ID' );
-		return;
+		return sendBadRequest(res, 'Invalid module ID' );
 	}
 
 	const user = match[1];
@@ -50,10 +49,7 @@ module.exports = function servePackage ( req, res, next ) {
 			if ( !meta.versions ) {
 				logger.error( `[${qualified}] invalid module` );
 
-				res.status( 400 );
-				res.end( 'invalid module' );
-
-				return;
+				return sendBadRequest(res, 'invalid module' );
 			}
 
 			const version = findVersion( meta, tag );
@@ -61,9 +57,7 @@ module.exports = function servePackage ( req, res, next ) {
 			if ( !semver.valid( version ) ) {
 				logger.error( `[${qualified}] invalid tag` );
 
-				res.status( 400 );
-				res.end( 'invalid tag' );
-				return;
+				return sendBadRequest(res, 'invalid tag' );
 			}
 
 			if ( version !== tag ) {
@@ -92,11 +86,10 @@ module.exports = function servePackage ( req, res, next ) {
 		})
 		.catch( err => {
 			logger.error( `[${qualified}] ${err.message}`, err.stack );
-			res.status( 500 );
 			const page = sander.readFileSync( `${root}/server/templates/500.html`, { encoding: 'utf-8' })
 				.replace( '__ERROR__', err.message );
 
-			res.end( page );
+			sendError(res, page);
 		});
 };
 
