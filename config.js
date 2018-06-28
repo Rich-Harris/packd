@@ -39,7 +39,7 @@ if (process.env.AWS) {
 	};
 
 	exports.onError = function (res) {
-		// TODO(sven): cloud watch alerting
+		// error will be propagated in the logs
 		res.status( 200 );
 	};
 }
