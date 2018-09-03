@@ -3,10 +3,7 @@ const sander = require( 'sander' );
 
 exports.root = path.resolve( __dirname );
 exports.tmpdir = process.env.NOW ? `/tmp` : `${exports.root}/.tmp`;
-
-// TODO(sven): this is a workarround https://twitter.com/svensauleau/status/1035880023964766209
-// exports.registry = 'https://registry.npmjs.org';
-exports.registry = 'https://registry.yarnpkg.com';
+exports.registry = 'https://registry.npmjs.org';
 
 if ( !process.env.NOW ) {
 	try {
