@@ -56,10 +56,7 @@ async function createBundle ({ hash, pkg, version, deep, query }) {
 }
 
 function fetchAndExtract ( pkg, version, dir ) {
-	let tarUrl = pkg.versions[ version ].dist.tarball;
-
-	// TODO(sven): this is a workarround https://twitter.com/svensauleau/status/1035880023964766209
-	tarUrl = tarUrl.replace("npmjs.org", "yarnpkg.com");
+	const tarUrl = pkg.versions[ version ].dist.tarball;
 
 	info( `[${pkg.name}] fetching ${tarUrl}` );
 
