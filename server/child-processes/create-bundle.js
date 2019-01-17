@@ -9,6 +9,7 @@ const resolve = require( 'rollup-plugin-node-resolve' );
 const UglifyJS = require( 'uglify-js' );
 const isModule = require( 'is-module' );
 const makeLegalIdentifier = require( '../utils/makeLegalIdentifier' );
+const babel = require( 'rollup-plugin-babel' );
 
 const { npmInstallEnvVars, root, tmpdir } = require( '../../config.js' );
 
@@ -130,9 +131,15 @@ function bundle ( cwd, deep, query ) {
 
 	const code = sander.readFileSync( entry, { encoding: 'utf-8' });
 
+	let babelPresetEnvTarget;
+
+	if (typeof query.target === 'string') {
+		babelPresetEnvTarget = query.target;
+	}
+
 	if ( isModule( code ) ) {
 		info( `[${pkg.name}] ES2015 module found, using Rollup` );
-		return bundleWithRollup( cwd, pkg, entry, moduleName );
+		return bundleWithRollup( cwd, pkg, entry, moduleName, babelPresetEnvTarget );
 	} else {
 		info( `[${pkg.name}] No ES2015 module found, using Browserify` );
 		return bundleWithBrowserify( pkg, entry, moduleName );
@@ -149,12 +156,29 @@ function findEntry ( file ) {
 	}
 }
 
-async function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
+async function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName, babelPresetEnvTarget ) {
+	const plugins = [
+		resolve({ module: true, jsnext: true, main: false, modulesOnly: true }),
+	];
+
+	if (typeof babelPresetEnvTarget === 'string') {
+		plugins.push(
+			babel({
+				babelrc: false,
+				presets: [
+					"flow",
+					["babel-preset-env", {
+						target: babelPresetEnvTarget,
+						modules: false
+					}]
+				]
+			})
+		);
+	}
+
 	const bundle = await rollup.rollup({
 		entry: path.resolve( cwd, moduleEntry ),
-		plugins: [
-			resolve({ module: true, jsnext: true, main: false, modulesOnly: true })
-		]
+		plugins
 	});
 
 	info( `[${pkg.name}] bundled using Rollup` );

@@ -24,6 +24,9 @@
   },
   "homepage": "https://github.com/Rich-Harris/packd#readme",
   "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
     "browserify": "^14.1.0",
     "compression": "^1.7.0",
     "etag": "^1.8.0",
@@ -36,6 +39,7 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "rollup": "^0.45.2",
+    "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^2.0.1",
     "sander": "^0.6.0",
