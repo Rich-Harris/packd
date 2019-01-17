@@ -130,12 +130,18 @@ function bundle ( cwd, deep, query ) {
 
 	const code = sander.readFileSync( entry, { encoding: 'utf-8' });
 
+    let external = [];
+
+    if (typeof query.externals === 'string') {
+      external = query.externals.split(',');
+    }
+
 	if ( isModule( code ) ) {
 		info( `[${pkg.name}] ES2015 module found, using Rollup` );
-		return bundleWithRollup( cwd, pkg, entry, moduleName );
+		return bundleWithRollup( cwd, pkg, entry, moduleName, external );
 	} else {
 		info( `[${pkg.name}] No ES2015 module found, using Browserify` );
-		return bundleWithBrowserify( pkg, entry, moduleName );
+		return bundleWithBrowserify( pkg, entry, moduleName, external );
 	}
 }
 
@@ -149,12 +155,13 @@ function findEntry ( file ) {
 	}
 }
 
-async function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
+async function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName, external ) {
 	const bundle = await rollup.rollup({
 		entry: path.resolve( cwd, moduleEntry ),
 		plugins: [
 			resolve({ module: true, jsnext: true, main: false, modulesOnly: true })
-		]
+		],
+        external,
 	});
 
 	info( `[${pkg.name}] bundled using Rollup` );
@@ -181,9 +188,10 @@ async function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
 	}
 }
 
-function bundleWithBrowserify ( pkg, main, moduleName ) {
+function bundleWithBrowserify ( pkg, main, moduleName, external ) {
 	const b = browserify( main, {
-		standalone: moduleName
+		standalone: moduleName,
+        external
 	});
 
 	return new Promise( ( fulfil, reject ) => {
