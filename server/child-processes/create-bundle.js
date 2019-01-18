@@ -1,3 +1,4 @@
+const fs = require( 'fs' );
 const path = require( 'path' );
 const sander = require( 'sander' );
 const child_process = require( 'child_process' );
@@ -6,7 +7,7 @@ const request = require( 'request' );
 const browserify = require( 'browserify' );
 const rollup = require( 'rollup' );
 const resolve = require( 'rollup-plugin-node-resolve' );
-const UglifyJS = require( 'uglify-js' );
+const Terser = require( 'terser' );
 const isModule = require( 'is-module' );
 const makeLegalIdentifier = require( '../utils/makeLegalIdentifier' );
 
@@ -29,12 +30,12 @@ async function createBundle ({ hash, pkg, version, deep, query }) {
 		await fetchAndExtract( pkg, version, dir );
 		await sanitizePkg( cwd );
 		await installDependencies( cwd );
-		
+
 		const code = await bundle( cwd, deep, query );
 
 		info( `[${pkg.name}] minifying` );
 
-		const result = UglifyJS.minify( code );
+		const result = Terser.minify( code );
 
 		if ( result.error ) {
 			info( `[${pkg.name}] minification failed: ${result.error.message}` );
@@ -149,36 +150,39 @@ function findEntry ( file ) {
 	}
 }
 
-async function bundleWithRollup ( cwd, pkg, moduleEntry, moduleName ) {
+async function bundleWithRollup ( cwd, pkg, moduleEntry, name ) {
 	const bundle = await rollup.rollup({
-		entry: path.resolve( cwd, moduleEntry ),
+		input: path.resolve( cwd, moduleEntry ),
 		plugins: [
 			resolve({ module: true, jsnext: true, main: false, modulesOnly: true })
 		]
 	});
 
-	info( `[${pkg.name}] bundled using Rollup` );
+	const result = await bundle.generate({
+		format: 'umd',
+		name
+	});
 
-	if ( bundle.imports.length > 0 ) {
+	if ( result.output.length > 0 ) {
+		info( `[${pkg.name}] generated multiple chunks, trying Browserify instead` );
+		return bundleWithBrowserify( pkg, moduleEntry, name );
+	}
+
+	if ( result.output[0].imports.length > 0 ) {
 		info( `[${pkg.name}] non-ES2015 dependencies found, handing off to Browserify` );
 
 		const intermediate = `${cwd}/__intermediate.js`;
-		return bundle.write({
-			dest: intermediate,
-			format: 'cjs'
-		}).then( () => {
-			return bundleWithBrowserify( pkg, intermediate, moduleName );
-		});
-	}
-
-	else {
 		const { code } = await bundle.generate({
-			format: 'umd',
-			moduleName
+			format: 'cjs'
 		});
 
-		return code;
+		fs.writeFileSync( intermediate, code );
+		return bundleWithBrowserify( pkg, intermediate, name );
 	}
+
+	info( `[${pkg.name}] bundled using Rollup` );
+
+	return result.output[0].code;
 }
 
 function bundleWithBrowserify ( pkg, main, moduleName ) {

@@ -1,6 +1,6 @@
 const LRU = require( 'lru-cache' );
 
-module.exports = LRU({
+module.exports = new LRU({
 	max: 128 * 1024 * 1024,
 	length: src => src.length
 });
