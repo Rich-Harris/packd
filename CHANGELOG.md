@@ -1,5 +1,8 @@
 # packd changelog
 
+## 2.7.0
+
+* Update Rollup to 1.0, replace Uglify with Terser ([#65](https://github.com/Rich-Harris/packd/pull/65))
 
 ## 2.6.1
 
