@@ -163,7 +163,7 @@ async function bundleWithRollup ( cwd, pkg, moduleEntry, name ) {
 		name
 	});
 
-	if ( result.output.length > 0 ) {
+	if ( result.output.length > 1 ) {
 		info( `[${pkg.name}] generated multiple chunks, trying Browserify instead` );
 		return bundleWithBrowserify( pkg, moduleEntry, name );
 	}
