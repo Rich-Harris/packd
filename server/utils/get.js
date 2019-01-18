@@ -1,19 +1,19 @@
-const https = require( 'https' );
+const https = require('https');
 
-module.exports = function get ( url ) {
-	return new Promise( ( fulfil, reject ) => {
-		https.get( url, response => {
+module.exports = function get(url) {
+	return new Promise((fulfil, reject) => {
+		https.get(url, response => {
 			let body = '';
 
-			response.on( 'data', chunk => {
+			response.on('data', chunk => {
 				body += chunk;
 			});
 
-			response.on( 'end', () => {
-				fulfil( body );
+			response.on('end', () => {
+				fulfil(body);
 			});
 
-			response.on( 'error', reject );
+			response.on('error', reject);
 		});
 	});
 };
