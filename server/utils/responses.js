@@ -17,5 +17,6 @@ module.exports.sendError = function sendError(res, msg) {
 		onError(res);
 	}
 
+	res.set('Content-Type', 'text/html');
 	res.end(msg);
 };
