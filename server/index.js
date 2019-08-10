@@ -131,6 +131,7 @@ app.get('/', (req, res) => {
 		.readFileSync(`${root}/server/templates/index.html`, 'utf-8')
 		.replace('__VERSION__', pkgInfo.version);
 
+	res.set('Content-Type', 'text/html');
 	res.end(index);
 });
 
