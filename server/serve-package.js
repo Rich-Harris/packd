@@ -47,6 +47,10 @@ module.exports = function servePackage(req, res, next) {
 		return query;
 	}, {});
 
+	if (query.format && (query.format !== 'umd' && query.format !== 'esm')) {
+		return sendBadRequest(res, 'Invalid format (must be umd or esm)');
+	}
+
 	get(`${registry}/${encodeURIComponent(qualified).replace('%40', '@')}`)
 		.then(JSON.parse)
 		.then(meta => {
