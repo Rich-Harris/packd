@@ -1,5 +1,9 @@
 # packd changelog
 
+## 2.8.0
+
+* Add `?format=esm` query parameter ([#102](https://github.com/Rich-Harris/packd/pull/102))
+
 ## 2.7.0
 
 * Update Rollup to 1.0, replace Uglify with Terser ([#65](https://github.com/Rich-Harris/packd/pull/65))
