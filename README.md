@@ -34,6 +34,12 @@ If you're using these URLs with `<script>` tags, you may need to specify the mod
 /underscore?name=_
 ```
 
+By default, Packd will generate a UMD bundle. In some cases, you can generate an ES module bundle instead, by appending `?format=esm`. This only works if the requested package, and all its dependents, are themselves distributed as ES modules.
+
+```
+/the-answer?format=esm
+```
+
 
 ## Hosting an instance
 
