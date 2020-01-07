@@ -131,24 +131,25 @@ function installDependencies(cwd) {
 function bundle(cwd, deep, query) {
 	const pkg = require(`${cwd}/package.json`);
 	const moduleName = query.name || makeLegalIdentifier(pkg.name);
+	const format = query.format || 'umd';
 
 	const entry = deep
 		? path.resolve(cwd, deep)
 		: findEntry(
-				path.resolve(
-					cwd,
-					pkg.module || pkg['jsnext:main'] || pkg.main || 'index.js'
-				)
+			path.resolve(
+				cwd,
+				pkg.module || pkg['jsnext:main'] || pkg.main || 'index.js'
+			)
 		  );
 
 	const code = sander.readFileSync(entry, { encoding: 'utf-8' });
 
 	if (isModule(code)) {
 		info(`[${pkg.name}] ES2015 module found, using Rollup`);
-		return bundleWithRollup(cwd, pkg, entry, moduleName);
+		return bundleWithRollup(cwd, pkg, entry, moduleName, format);
 	} else {
 		info(`[${pkg.name}] No ES2015 module found, using Browserify`);
-		return bundleWithBrowserify(pkg, entry, moduleName);
+		return bundleWithBrowserify(pkg, entry, moduleName, format);
 	}
 }
 
@@ -162,7 +163,7 @@ function findEntry(file) {
 	}
 }
 
-async function bundleWithRollup(cwd, pkg, moduleEntry, name) {
+async function bundleWithRollup(cwd, pkg, moduleEntry, name, format) {
 	const bundle = await rollup.rollup({
 		input: path.resolve(cwd, moduleEntry),
 		plugins: [
@@ -171,13 +172,13 @@ async function bundleWithRollup(cwd, pkg, moduleEntry, name) {
 	});
 
 	const result = await bundle.generate({
-		format: 'umd',
+		format,
 		name
 	});
 
 	if (result.output.length > 1) {
 		info(`[${pkg.name}] generated multiple chunks, trying Browserify instead`);
-		return bundleWithBrowserify(pkg, moduleEntry, name);
+		return bundleWithBrowserify(pkg, moduleEntry, name, format);
 	}
 
 	if (result.output[0].imports.length > 0) {
@@ -191,7 +192,7 @@ async function bundleWithRollup(cwd, pkg, moduleEntry, name) {
 		});
 
 		fs.writeFileSync(intermediate, code);
-		return bundleWithBrowserify(pkg, intermediate, name);
+		return bundleWithBrowserify(pkg, intermediate, name, format);
 	}
 
 	info(`[${pkg.name}] bundled using Rollup`);
@@ -199,7 +200,11 @@ async function bundleWithRollup(cwd, pkg, moduleEntry, name) {
 	return result.output[0].code;
 }
 
-function bundleWithBrowserify(pkg, main, moduleName) {
+function bundleWithBrowserify(pkg, main, moduleName, format) {
+	if (format === 'esm') {
+		throw new Error(`Failed to generate ES module`);
+	}
+
 	const b = browserify(main, {
 		standalone: moduleName
 	});
