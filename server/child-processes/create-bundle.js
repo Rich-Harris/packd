@@ -133,13 +133,15 @@ function bundle(cwd, deep, query) {
 	const moduleName = query.name || makeLegalIdentifier(pkg.name);
 	const format = query.format || 'umd';
 
+	const entryName = pkg.module || pkg['jsnext:main'] || pkg.main;
+	if (!entryName) {
+		throw new Error("package has no entry file; please specify a `module` key in your `package.json`.");
+	}
+
 	const entry = deep
 		? path.resolve(cwd, deep)
 		: findEntry(
-			path.resolve(
-				cwd,
-				pkg.module || pkg['jsnext:main'] || pkg.main || 'index.js'
-			)
+			path.resolve(cwd, entryName)
 		  );
 
 	const code = sander.readFileSync(entry, { encoding: 'utf-8' });
