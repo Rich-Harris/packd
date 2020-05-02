@@ -21,7 +21,7 @@ exports.additionalBundleResHeaders = {
 	'Cache-Control': 'max-age=86400',
 };
 
-if (process.env.AWS) {
+if (process.env.BUNDLE_RUN) {
 	const cacheExpiration = 60 * 60 * 24 * 365;
 	exports.npmInstallEnvVars = ["npm_config_cache=~/.npm"];
 	exports.debugEndpoints = false;
@@ -32,15 +32,6 @@ if (process.env.AWS) {
 		'Access-Control-Request-Method': 'GET',
 		'X-Powered-By': 'https://github.com/rich-harris/packd',
 		'Strict-Transport-Security': `max-age=${cacheExpiration}; includeSubDomains; preload`,
-	};
-
-	exports.onBadRequest = function (res) {
-		res.status( 200 );
-	};
-
-	exports.onError = function (res) {
-		// error will be propagated in the logs
-		res.status( 200 );
 	};
 }
 
