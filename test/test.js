@@ -1,6 +1,5 @@
 const { fork } = require('child_process');
 const request = require('request-promise');
-const { gunzipSync } = require('zlib');
 const assert = require('assert');
 
 const server = fork('server/index.js', ['start'], {
@@ -8,11 +7,7 @@ const server = fork('server/index.js', ['start'], {
 });
 
 async function getPackage (id) {
-	const zipped = await request(`http://localhost:9000/${id}`, {
-		encoding: null
-	});
-
-	const source = gunzipSync(zipped).toString();
+	const source = await request(`http://localhost:9000/${id}`);
 
 	const fn = new Function('module', 'exports', source);
 	const mod = { exports: {} };

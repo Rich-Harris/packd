@@ -77,23 +77,19 @@ module.exports = function servePackage(req, res, next) {
 				return;
 			}
 
-			return fetchBundle(meta, tag, deep, query).then(zipped => {
-				logger.info(`[${qualified}] serving ${zipped.length} bytes`);
+			return fetchBundle(meta, tag, deep, query).then(result => {
 				res.status(200);
 				res.set(
 					Object.assign(
 						{
-							'Content-Length': zipped.length,
+							//'Content-Length': result.length,
 							'Content-Type': 'application/javascript; charset=utf-8',
-							'Content-Encoding': 'gzip'
 						},
 						additionalBundleResHeaders
 					)
 				);
-
-				// FIXME(sven): calculate the etag based on the original content
-				res.setHeader('ETag', etag(zipped));
-				res.end(zipped);
+				res.setHeader('ETag', etag(result));
+				res.end(result);
 			});
 		})
 		.catch(err => {
@@ -132,18 +128,17 @@ function fetchBundle(pkg, version, deep, query) {
 		inProgress[hash] = createBundle(hash, pkg, version, deep, query)
 			.then(
 				result => {
-					const zipped = zlib.gzipSync(result);
-					cache.set(hash, zipped);
-					return zipped;
+					cache.set(hash, result);
+					return result;
 				},
 				err => {
 					inProgress[hash] = null;
 					throw err;
 				}
 			)
-			.then(zipped => {
+			.then(result => {
 				inProgress[hash] = null;
-				return zipped;
+				return result;
 			});
 	}
 
