@@ -1,8 +1,9 @@
 const path = require( 'path' );
 const sander = require( 'sander' );
+const tempdir = require('tempdir');
 
 exports.root = path.resolve( __dirname );
-exports.tmpdir = process.env.NOW ? `/tmp` : `${exports.root}/.tmp`;
+exports.tmpdir = tempdir.sync();
 exports.registry = 'https://registry.npmjs.org';
 
 if ( !process.env.NOW ) {

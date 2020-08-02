@@ -107,7 +107,7 @@ function installDependencies(cwd) {
 	const pkg = require(`${cwd}/package.json`);
 
 	const envVariables = npmInstallEnvVars.join(' ');
-	const installCommand = `${envVariables} ${root}/node_modules/.bin/npm install --production`;
+	const installCommand = `${envVariables} npm install --production`;
 
 	info(`[${pkg.name}] running ${installCommand}`);
 
@@ -119,7 +119,7 @@ function installDependencies(cwd) {
 				info(`[${pkg.name}] installing peer dependency ${name}`);
 				const version = pkg.peerDependencies[name];
 				return exec(
-					`${root}/node_modules/.bin/npm install "${name}@${version}"`,
+					`npm install "${name}@${version}"`,
 					cwd,
 					pkg
 				);

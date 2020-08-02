@@ -8,6 +8,7 @@ const logger = require('./logger.js');
 const cache = require('./cache.js');
 const etag = require('etag');
 const sha1 = require('sha1');
+const path = require('path');
 
 const { sendBadRequest, sendError } = require('./utils/responses.js');
 const { root, registry, additionalBundleResHeaders } = require('../config.js');
@@ -73,14 +74,16 @@ module.exports = function servePackage(req, res, next) {
 				if (deep) url += `/${deep}`;
 				url += stringify(query);
 
-				res.redirect(302, url);
+				res.writeHead(302, {
+					'Location': url
+				});
+				res.end();
 				return;
 			}
 
 			return fetchBundle(meta, tag, deep, query).then(zipped => {
 				logger.info(`[${qualified}] serving ${zipped.length} bytes`);
-				res.status(200);
-				res.set(
+				res.writeHead(200,
 					Object.assign(
 						{
 							'Content-Length': zipped.length,
@@ -152,7 +155,8 @@ function fetchBundle(pkg, version, deep, query) {
 
 function createBundle(hash, pkg, version, deep, query) {
 	return new Promise((fulfil, reject) => {
-		const child = fork('server/child-processes/create-bundle.js');
+		const builderPath = path.resolve(__dirname, './child-processes/create-bundle.js');
+		const child = fork(builderPath);
 
 		child.on('message', message => {
 			if (message === 'ready') {

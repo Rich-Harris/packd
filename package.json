@@ -3,10 +3,9 @@
   "version": "2.8.0",
   "description": "Simple alternative to browserify-cdn",
   "scripts": {
-    "start": "node server",
-    "deploy": "now && now alias",
-    "test": "node test/test.js",
-    "postpublish": "npm run deploy"
+    "deploy": "now --public && now alias",
+    "postpublish": "npm run deploy",
+    "test": "eslint"
   },
   "repository": {
     "type": "git",
@@ -18,10 +17,6 @@
     "npm"
   ],
   "author": "Rich Harris",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Rich-Harris/packd/issues"
-  },
   "homepage": "https://github.com/Rich-Harris/packd#readme",
   "dependencies": {
     "browserify": "^16.2.3",
@@ -43,6 +38,7 @@
     "serve-favicon": "^2.4.2",
     "sha1": "^1.1.1",
     "tar": "^4.4.8",
+    "tempdir": "^2.0.0",
     "terser": "^3.14.1"
   },
   "devDependencies": {
