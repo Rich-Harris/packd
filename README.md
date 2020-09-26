@@ -31,7 +31,7 @@ You can specify a tag (e.g. 'latest') or a version (e.g. '1.2.3'):
 If you're using these URLs with `<script>` tags, you may need to specify the module's name (i.e. the global variable name used to access it, corresponding to `moduleName` in Rollup and `standalone` in Browserify). packd will guess based on the module ID, but you may need to control it with the `name` query:
 
 ```
-/underscore?name=_
+/lodash?name=_
 ```
 
 By default, Packd will generate a UMD bundle. In some cases, you can generate an ES module bundle instead, by appending `?format=esm`. This only works if the requested package, and all its dependents, are themselves distributed as ES modules.
