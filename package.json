@@ -43,7 +43,7 @@
     "serve-favicon": "^2.4.2",
     "sha1": "^1.1.1",
     "tar": "^4.4.8",
-    "terser": "^3.14.1"
+    "terser": "^4.8.1"
   },
   "devDependencies": {
     "eslint": "^5.12.0"
